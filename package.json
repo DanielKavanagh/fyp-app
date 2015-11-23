@@ -1,0 +1,21 @@
+{
+  "name": "nfl-fyp",
+  "version": "0.0.0",
+  "description": "Final Year Project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/DanielKavanagh/nfl-fyp.git"
+  },
+  "author": "Daniel Kavanagh",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/DanielKavanagh/nfl-fyp/issues"
+  },
+  "dependencies": {
+    "express": "~4.13.3"
+  }
+}
