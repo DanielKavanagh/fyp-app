@@ -16,6 +16,7 @@
     "url": "https://github.com/DanielKavanagh/nfl-fyp/issues"
   },
   "dependencies": {
-    "express": "~4.13.3"
+    "express": "~4.13.3",
+    "mysql": "~2.9.0"
   }
 }
