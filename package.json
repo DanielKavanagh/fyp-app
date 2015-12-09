@@ -18,5 +18,11 @@
   "dependencies": {
     "express": "~4.13.3",
     "mysql": "~2.9.0"
+  },
+  "devDependencies": {
+    "mocha": "~2.3.4",
+    "chai": "~3.4.1",
+    "sinon": "~1.17.2",
+    "mockery": "~1.4.0"
   }
 }
