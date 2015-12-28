@@ -2,7 +2,7 @@
   "name": "nfl-fyp",
   "version": "0.0.0",
   "description": "Final Year Project",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodejs app.js"
@@ -18,7 +18,8 @@
   },
   "dependencies": {
     "express": "~4.13.3",
-    "mysql": "~2.9.0"
+    "mysql": "~2.9.0",
+    "request": "~2.67.0"
   },
   "devDependencies": {
     "mocha": "~2.3.4",
