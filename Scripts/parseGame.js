@@ -8,7 +8,6 @@ var gameCollection = [];
 
 /*Setup DB Connection*/
 
-
 /*Async Request Queue */
 var gameIDQueue = async.queue(function(task, callback) {
 	request(task, function(error, response, body) {
@@ -28,9 +27,7 @@ var gameIDQueue = async.queue(function(task, callback) {
 	});
 });
 
-
 for(var i=0; i <=16; i++) {
-
 	gameIDQueue.push('http://www.nfl.com/ajax/scorestrip?season='+ '2015' +'&seasonType=REG&week=' + (i+1));
 }
 
