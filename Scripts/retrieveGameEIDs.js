@@ -36,8 +36,6 @@ function getSeasonWeeks(season) {
                 console.log('Got Week');
             });
 
-            console.log(weekIndex);
-            
             weekIndex++;
             callback(null, weekIndex);
 
