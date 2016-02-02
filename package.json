@@ -22,7 +22,8 @@
     "jade": "~1.11.0",
     "mysql": "~2.9.0",
     "request": "~2.67.0",
-    "xml2js": "~0.4.16"
+    "xml2js": "~0.4.16",
+    "mkdirp": "~0.5.1"
   },
   "devDependencies": {
     "mocha": "~2.3.4",
