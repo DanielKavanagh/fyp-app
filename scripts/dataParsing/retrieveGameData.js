@@ -1,5 +1,5 @@
 /**
- * Created by Daniel on 01/02/2016.
+ * Created by Daniel on 02/01/2016.
  * What: Command line script which retrieves the JSON Data for an NFL season (Regular season only).
  * How: Retrieves the game-center identifiers (EIDs) for all weeks in a season. These EIDs are then used to query the
  *      play-by-play JSON stream. The json files are then saved, to be entered into the database at a later time.
@@ -10,6 +10,7 @@ var request = require('request');
 var async = require('async');
 var fs = require('fs');
 var path = require('path');
+var mkdirp = require('mkdirp');
 var parseString = require('xml2js').parseString;
 
 function main() {
@@ -21,11 +22,11 @@ function main() {
     async.waterfall([
         async.apply(getEIDs, process.argv[2]),
         getGameData
-    ], function (err, result) {
+    ], function (err) {
         if (err) {
             console.log('Error: ' + err);
         } else {
-            console.log(result);
+            console.log('Finished!');
         }
     });
 }
@@ -36,7 +37,7 @@ function getEIDs(season, getEIDCallback) {
 
     /*Loop over each week in the season*/
     async.whilst(
-        function () { return weekIndex < 4; },
+        function () { return weekIndex < 17; },
         function (weekCallback) {
             var eidArray = [];
             weekIndex++;
@@ -82,24 +83,30 @@ function getEIDs(season, getEIDCallback) {
 
 /*Get the game data for each eid*/
 function getGameData(seasonArray, season, getGameCallback) {
-    //console.log(seasonArray);
     async.each(seasonArray, function(obj, outerCallback) {
-        console.log(obj.week);
         async.eachLimit(obj.eids, 1, function(weekObj, innerCallback) {
+            console.log('Getting:\t' + weekObj);
             request('http://www.nfl.com/liveupdate/game-center/'+ weekObj +'/'+ weekObj +'_gtd.json', function(err, resp, body) {
                 if(!err && resp.statusCode == 200) {
+                    console.log('Got:\t\t' + weekObj);
                     var jsonObj = JSON.parse(body);
-                    fs.writeFile(path.join(__dirname, '/data/' + season + '/week_' + obj.week + '/' + Object.keys(jsonObj)[0]), body, {flags: 'wx'}, function(err) {
+
+                    mkdirp('/home/vagrant/fyp/fyp-app/jsonData/' + season + '/week_' + obj.week, function(err) {
                         if(err) {
-                            return console.log('Error: ' + err);
+                            console.log('mkdirp: ' + err);
+                        } else {
+                            fs.writeFile('/home/vagrant/fyp/fyp-app/jsonData/' + season + '/week_' + obj.week + '/' + Object.keys(jsonObj)[0], body, {flags: 'wx'}, function(err) {
+                                if(err) {
+                                    return console.log('Error: ' + err);
+                                } else {
+                                    console.log('Saved:\t\t' + weekObj);
+                                }
+                            });
                         }
-
-
                     });
                 }
 
                 innerCallback();
-
             });
 
         }, function(err) {
@@ -111,6 +118,12 @@ function getGameData(seasonArray, season, getGameCallback) {
 
         });
 
+    }, function(err) {
+        if(err) {
+            console.log(err);
+        }
+
+        getGameCallback();
     });
 }
 
