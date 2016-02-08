@@ -56,68 +56,87 @@ function createGameObject(gameObj) {
 
     obj.eid = Object.keys(gameObj)[0];
 
-    connection.query('SELECT team_id, team_abbr FROM team WHERE `team_abbr` = ?', [gameRef.home.abbr],
-        function (err, results, fields) {
-            if (err) {
-                return console.log(err);
-            }
+    async.series([
+        function(callback) {
+            connection.query('SELECT team_id, team_abbr FROM team WHERE `team_abbr` = ?', [gameRef.home.abbr],
+                function (err, results, fields) {
+                    if (err) {
+                        return console.log(err);
+                    }
 
-            if (results.length !== 1) {
-                return console.log('Error: Zero (or more than one) results');
-            }
-            obj.home_team_id = results[0].team_id;
-    });
+                    if (results.length !== 1) {
+                        console.log(results);
+                        return console.log('Error: Zero (or more than one) results');
+                    }
+                    obj.home_team_id = results[0].team_id;
+                    obj.home_score_final        = gameRef.home.score.T;
+                    obj.home_score_q1           = gameRef.home.score['1'];
+                    obj.home_score_q2           = gameRef.home.score['2'];
+                    obj.home_score_q3           = gameRef.home.score['3'];
+                    obj.home_score_q4           = gameRef.home.score['4'];
+                    obj.home_score_q5           = gameRef.home.score['5'];
+                    obj.home_total_fds          = gameRef.home.stats.team.totfd;
+                    obj.home_total_yds          = gameRef.home.stats.team.totyds;
+                    obj.home_total_pass_yards   = gameRef.home.stats.team.pyds;
+                    obj.home_total_rush_yards   = gameRef.home.stats.team.ryds;
+                    obj.home_total_pens         = gameRef.home.stats.team.pen;
+                    obj.home_total_pen_yards    = gameRef.home.stats.team.penyds;
+                    obj.home_time_of_pos        = gameRef.home.stats.team.top;
+                    obj.home_turnovers          = gameRef.home.stats.team.trnovr;
+                    obj.home_total_punts        = gameRef.home.stats.team.pt;
+                    obj.home_total_punt_yards   = gameRef.home.stats.team.ptyds;
+                    obj.home_total_punt_avg     = gameRef.home.stats.team.ptavg;
 
-    obj.home_score_final        = gameRef.home.score.T;
-    obj.home_score_q1           = gameRef.home.score['1'];
-    obj.home_score_q2           = gameRef.home.score['2'];
-    obj.home_score_q3           = gameRef.home.score['3'];
-    obj.home_score_q4           = gameRef.home.score['4'];
-    obj.home_score_q5           = gameRef.home.score['5'];
-    obj.home_total_fds          = gameRef.home.stats.team.totfd;
-    obj.home_total_yds          = gameRef.home.stats.team.totyds;
-    obj.home_total_pass_yards   = gameRef.home.stats.team.pyds;
-    obj.home_total_rush_yards   = gameRef.home.stats.team.ryds;
-    obj.home_total_pens         = gameRef.home.stats.team.pen;
-    obj.home_total_pen_yards    = gameRef.home.stats.team.penyds;
-    obj.home_time_of_pos        = gameRef.home.stats.team.top;
-    obj.home_turnovers          = gameRef.home.stats.team.trnovr;
-    obj.home_total_punts        = gameRef.home.stats.team.pt;
-    obj.home_total_punt_yards   = gameRef.home.stats.team.ptyds;
-    obj.home_total_punt_avg     = gameRef.home.stats.team.ptavg;
+                    callback(null);
+                });
+        },
+        function(callback) {
+            connection.query('SELECT team_id, team_abbr FROM team WHERE `team_abbr` = ?', [gameRef.away.abbr],
+                function (err, results, fields) {
+                    if (err) {
+                        return console.log(err);
+                    }
 
-    connection.query('SELECT team_id, team_abbr FROM team WHERE `team_abbr` = ?', [gameRef.away.abbr],
-        function (err, results, fields) {
-            if (err) {
-                return console.log(err);
-            }
+                    if (results.length !== 1) {
+                        console.log(results);
+                        return console.log('Error: Zero (or more than one) results');
+                    }
 
-            if (results.length !== 1) {
-                return console.log('Error: Zero (or more than one) results');
-            }
+                    obj.away_team_id = results[0].team_id;
+                    obj.away_score_final        = gameRef.away.score.T;
+                    obj.away_score_q1           = gameRef.away.score['1'];
+                    obj.away_score_q2           = gameRef.away.score['2'];
+                    obj.away_score_q3           = gameRef.away.score['3'];
+                    obj.away_score_q4           = gameRef.away.score['4'];
+                    obj.away_score_q5           = gameRef.away.score['5'];
+                    obj.away_total_fds          = gameRef.away.stats.team.totfd;
+                    obj.away_total_yds          = gameRef.away.stats.team.totyds;
+                    obj.away_total_pass_yards   = gameRef.away.stats.team.pyds;
+                    obj.away_total_rush_yards   = gameRef.away.stats.team.ryds;
+                    obj.away_total_pens         = gameRef.away.stats.team.pen;
+                    obj.away_total_pen_yards    = gameRef.away.stats.team.penyds;
+                    obj.away_time_of_pos        = gameRef.away.stats.team.top;
+                    obj.away_turnovers          = gameRef.away.stats.team.trnovr;
+                    obj.away_total_punts        = gameRef.away.stats.team.pt;
+                    obj.away_total_punt_yards   = gameRef.away.stats.team.ptyds;
+                    obj.away_total_punt_avg     = gameRef.away.stats.team.ptavg;
 
-            obj.away_team_id = results[0].team_id;
-        });
+                    callback(null);
+                });
+        }
+    ],
+    function(err) {
+        if(err) {
+            console.log(err);
+        }
 
-    obj.away_score_final        = gameRef.away.score.T;
-    obj.away_score_q1           = gameRef.away.score['1'];
-    obj.away_score_q2           = gameRef.away.score['2'];
-    obj.away_score_q3           = gameRef.away.score['3'];
-    obj.away_score_q4           = gameRef.away.score['4'];
-    obj.away_score_q5           = gameRef.away.score['5'];
-    obj.away_total_fds          = gameRef.away.stats.team.totfd;
-    obj.away_total_yds          = gameRef.away.stats.team.totyds;
-    obj.away_total_pass_yards   = gameRef.away.stats.team.pyds;
-    obj.away_total_rush_yards   = gameRef.away.stats.team.ryds;
-    obj.away_total_pens         = gameRef.away.stats.team.pen;
-    obj.away_total_pen_yards    = gameRef.away.stats.team.penyds;
-    obj.away_time_of_pos        = gameRef.away.stats.team.top;
-    obj.away_turnovers          = gameRef.away.stats.team.trnovr;
-    obj.away_total_punts        = gameRef.away.stats.team.pt;
-    obj.away_total_punt_yards   = gameRef.away.stats.team.ptyds;
-    obj.away_total_punt_avg     = gameRef.away.stats.team.ptavg;
+        console.log(obj);
+    })
 
-    console.log(obj);
+
+
+
+
 }
 
 function insertGames(gameObjArr, insertGameCallback) {
@@ -126,6 +145,7 @@ function insertGames(gameObjArr, insertGameCallback) {
             if (err) {
                 return console.log(err);
             }
+
 
             var gameObj = createGameObject(game);
 
