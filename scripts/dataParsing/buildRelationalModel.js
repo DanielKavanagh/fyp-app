@@ -51,13 +51,13 @@ function readDirectory(directory, readDirectoryCallback) {
     });
 }
 
-function createGameObject(gameObj) {
+function createGameObject(gameObj, gameCallback) {
     var obj = {}, gameRef = gameObj[Object.keys(gameObj)[0]];
 
-    obj.eid = Object.keys(gameObj)[0];
+    obj.game_eid = Object.keys(gameObj)[0];
 
     async.series([
-        function(callback) {
+        function (callback) {
             connection.query('SELECT team_id, team_abbr FROM team WHERE `team_abbr` = ?', [gameRef.home.abbr],
                 function (err, results, fields) {
                     if (err) {
@@ -68,6 +68,9 @@ function createGameObject(gameObj) {
                         console.log(results);
                         return console.log('Error: Zero (or more than one) results');
                     }
+
+                    console.log(results[0].team_id);
+
                     obj.home_team_id = results[0].team_id;
                     obj.home_score_final        = gameRef.home.score.T;
                     obj.home_score_q1           = gameRef.home.score['1'];
@@ -90,7 +93,7 @@ function createGameObject(gameObj) {
                     callback(null);
                 });
         },
-        function(callback) {
+        function (callback) {
             connection.query('SELECT team_id, team_abbr FROM team WHERE `team_abbr` = ?', [gameRef.away.abbr],
                 function (err, results, fields) {
                     if (err) {
@@ -98,7 +101,7 @@ function createGameObject(gameObj) {
                     }
 
                     if (results.length !== 1) {
-                        console.log(results);
+                        console.log(gameRef.away.abbr);
                         return console.log('Error: Zero (or more than one) results');
                     }
 
@@ -125,18 +128,14 @@ function createGameObject(gameObj) {
                 });
         }
     ],
-    function(err) {
-        if(err) {
-            console.log(err);
-        }
+        function (err) {
+            if (err) {
+                console.log(err);
+            }
 
-        console.log(obj);
-    })
+            gameCallback(obj);
 
-
-
-
-
+        });
 }
 
 function insertGames(gameObjArr, insertGameCallback) {
@@ -146,32 +145,33 @@ function insertGames(gameObjArr, insertGameCallback) {
                 return console.log(err);
             }
 
+            createGameObject(game, function (gameObj) {
+                connection.query('INSERT INTO game SET ?', gameObj,
+                    function (err, result) {
+                        if (err) {
+                            return connection.rollback(function () {
+                                throw err;
+                            });
+                        }
+                    });
 
-            var gameObj = createGameObject(game);
-
-            connection.query('INSERT INTO game VALUES ?', gameObj,
-                function (err, result) {
+                connection.commit(function (err) {
                     if (err) {
-                        return connection.rollback(function () {
-                            throw err;
-                        });
+                        return console.log(err);
                     }
-
-                    //console.log('Inserted: ' + result);
-                }
-            );
-
-            connection.commit(function (err) {
-                if (err) {
-                    return console.log(err);
-                }
-                callback();
+                    console.log('Done');
+                    callback();
+                });
             });
+
+
+
         });
     }, function (err) {
         if (err) {
             return console.log(err);
         }
+
         insertGameCallback();
     });
 }
