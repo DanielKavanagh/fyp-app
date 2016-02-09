@@ -51,7 +51,7 @@ function readDirectory(directory, readDirectoryCallback) {
     });
 }
 
-function createGameObject(gameObj, gameCallback) {
+function createGameObject(gameObj, rootCallback) {
     var obj = {}, gameRef = gameObj[Object.keys(gameObj)[0]];
 
     obj.game_eid = Object.keys(gameObj)[0];
@@ -59,7 +59,7 @@ function createGameObject(gameObj, gameCallback) {
     async.series([
         function (callback) {
             connection.query('SELECT team_id, team_abbr FROM team WHERE `team_abbr` = ?', [gameRef.home.abbr],
-                function (err, results, fields) {
+                function (err, results) {
                     if (err) {
                         return console.log(err);
                     }
@@ -68,8 +68,6 @@ function createGameObject(gameObj, gameCallback) {
                         console.log(results);
                         return console.log('Error: Zero (or more than one) results');
                     }
-
-                    console.log(results[0].team_id);
 
                     obj.home_team_id = results[0].team_id;
                     obj.home_score_final        = gameRef.home.score.T;
@@ -126,6 +124,18 @@ function createGameObject(gameObj, gameCallback) {
 
                     callback(null);
                 });
+        },
+        function (callback) {
+            connection.query('INSERT INTO game SET ?', obj,
+                function (err) {
+                    if (err) {
+                        return connection.rollback(function () {
+                            throw err;
+                        });
+                    }
+
+                    callback();
+                });
         }
     ],
         function (err) {
@@ -133,9 +143,14 @@ function createGameObject(gameObj, gameCallback) {
                 console.log(err);
             }
 
-            gameCallback(obj);
+            rootCallback(null);
 
         });
+}
+
+function createDriveObject(rootCallback) {
+    console.log('created drive objects');
+    rootCallback();
 }
 
 function insertGames(gameObjArr, insertGameCallback) {
@@ -145,27 +160,23 @@ function insertGames(gameObjArr, insertGameCallback) {
                 return console.log(err);
             }
 
-            createGameObject(game, function (gameObj) {
-                connection.query('INSERT INTO game SET ?', gameObj,
-                    function (err, result) {
-                        if (err) {
-                            return connection.rollback(function () {
-                                throw err;
-                            });
-                        }
-                    });
-
-                connection.commit(function (err) {
+            async.waterfall([
+                async.apply(createGameObject, game),
+                createDriveObject
+            ],
+                function (err) {
                     if (err) {
-                        return console.log(err);
+                        return console.log('Async Waterfall Error: ' + err);
                     }
-                    console.log('Done');
-                    callback();
+
+                    connection.commit(function (err) {
+                        if (err) {
+                            return console.log(err);
+                        }
+                        console.log('Done');
+                        callback();
+                    });
                 });
-            });
-
-
-
         });
     }, function (err) {
         if (err) {
