@@ -1,7 +1,6 @@
 var exports = module.exports = {};
 
 exports.convertMinSecToSec = function minSecToSec(data) {
-
     var time = data.split(':');
 
     if (time.length === 2) {
