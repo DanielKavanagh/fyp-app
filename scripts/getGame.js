@@ -24,7 +24,7 @@ connection.connect(function (err) {
 });
 
 //Get the game center IDs for the week
-request('http://www.nfl.com/ajax/scorestrip?season=2015&seasonType=REG&week=1', function(err, response, body) {
+request('http://www.nfl.com/ajax/scorestrip?season=2015&seasonType=REG&week=1', function (err, response, body) {
 
     parseString(body, function(err, result) {
 
@@ -41,7 +41,7 @@ function getWeekGameData(gameIDs) {
         request('http://www.nfl.com/liveupdate/game-center/'+ id.$.eid +'/'+ id.$.eid +'_gtd.json', function (err, response, body) {
             insertGame(body, id.$.eid, callback);
         });
-    }, function(err) {
+    }, function (err) {
         console.log('done');
         //All requests and inserts are done
         var sql = "INSERT INTO Import_Game_Data VALUES ?";
