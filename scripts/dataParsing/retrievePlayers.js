@@ -90,6 +90,9 @@ function getTeamRosters(teamArray, callback) {
 }
 
 function getPlayers(playerArray, callback) {
+    async.each(playerArray, function (player, playerCallback) {
+
+    });
     callback();
 }
 
