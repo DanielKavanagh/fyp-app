@@ -1,13 +1,16 @@
 /**
  * Created by Daniel on 10/02/2016.
+ * TODO: Add @callback comments for each callback, documenting their params/function
+ *
  */
 
 'use strict';
 
 /* Import dependencies */
-var request = require('request');
-var async = require('async');
-var mysql = require('mysql');
+var request     = require('request');
+var async       = require('async');
+var mysql       = require('mysql');
+var cheerio     = require('cheerio');
 
 var baseRosterURL = 'http://www.nfl.com/teams/roster?team=';
 var baseProfileURL = 'http://www.nfl.com/players/profile?id=';
@@ -27,24 +30,53 @@ connection.connect(function (err) {
     }
 });
 
+/**
+ * getTeams retrieves the team name abbreviations from the database.
+ * The callback function is called when the query returns successfully.
+ * @param {function} callback - Callback which sends the async waterfall to the next function
+ * @return {string[]} teamList - Array containing team abbreviations*/
 function getTeams(callback) {
-    connection.query('SELECT team_abbr FROM team WHERE team_abbr != "UNK"', function (err, results) {
+    connection.query('SELECT team_abbr FROM team WHERE team_abbr = "PHI"', function (err, teamArray) {
         if (err) {
             return console.log(err);
         }
 
-        callback(null, results);
+        if (teamArray.length === 0) {
+            return console.log('Query - No Teams Returned');
+        }
+
+        callback(null, teamArray);
     });
 }
 
-function getTeamRosters(teams, callback) {
-    async.each(teams, function (team, teamCallback) {
+/**
+ * Using an array of team name abbreviations, retrieves the team rosters from nfl.com
+ * The player profile identifiers are then scraped from the HTML and returned.
+ * @param {string[]} teamList - Array containing team abbreviations*/
+function getTeamRosters(teamArray, callback) {
+    var playerArray = [];
+
+    async.each(teamArray, function (team, teamCallback) {
+        console.log('Doing Request');
         request(baseRosterURL + team.team_abbr, function (err, response, body) {
             if (err) {
                 return console.log(err);
             }
 
-            console.log(typeof body);
+            var $ = cheerio.load(body);
+
+            $('#team-stats-wrapper').children('#result').children().last('tbody').children().each(function () {
+                var profileUrl = $(this).children().eq(1).children().attr('href');
+                var urlArray = profileUrl.split('/');
+
+                //isNaN returns false if the argument is numeric
+                if (isNaN(urlArray[3]) === false) {
+                    playerArray.push(urlArray[3]);
+                } else {
+                    console.log('"' + urlArray[3] + '" is not a number');
+                }
+            });
+
             teamCallback();
         });
     },
@@ -53,24 +85,32 @@ function getTeamRosters(teams, callback) {
                 return console.log(err);
             }
 
-            callback();
+            callback(null, playerArray);
         });
 }
 
-function getPlayer() {
-
+function getPlayers(playerArray, callback) {
+    callback();
 }
 
 function main() {
     async.waterfall([
         getTeams,
         getTeamRosters,
-        getPlayer
+        getPlayers
     ],
         function (err) {
             if (err) {
                 return console.log(err);
             }
+
+            connection.end(function (err) {
+                if (err) {
+                    return console.log(err);
+                }
+
+                return console.log('Database Connection Closed...');
+            });
         });
 }
 
