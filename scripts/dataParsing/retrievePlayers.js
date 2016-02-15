@@ -56,7 +56,7 @@ function getTeams(callback) {
 function getTeamRosters(teamArray, callback) {
     var playerArray = [];
 
-    async.each(teamArray, function (team, teamCallback) {
+    async.eachLimit(teamArray, 1, function (team, teamCallback) {
         console.log('Doing Request');
         request(baseRosterURL + team.team_abbr, function (err, response, body) {
             if (err) {
@@ -77,7 +77,10 @@ function getTeamRosters(teamArray, callback) {
                 }
             });
 
-            teamCallback();
+            //Wait 2 seconds to prevent being blocked by nfl.com
+            setTimeout(function () {
+                teamCallback();
+            }, 5000);
         });
     },
         function (err) {
@@ -89,11 +92,38 @@ function getTeamRosters(teamArray, callback) {
         });
 }
 
+/**
+ * Using an array of player profile strings, retrieve the player information from nfl.com,
+ * and insert it into the database.
+ * @param {string[]} playerArray - Array of player profile identifiers */
 function getPlayers(playerArray, callback) {
-    async.each(playerArray, function (player, playerCallback) {
+    async.eachLimit(playerArray, 1, function (player, playerCallback) {
+        var playerObj = {};
 
-    });
-    callback();
+        console.log('Request: ' + baseProfileURL + player);
+        request(baseProfileURL + player, function (err, response, body) {
+            if (err) {
+                return console.log(err);
+            }
+
+            var $ = cheerio.load(body);
+
+            playerObj.player_name = $('.player-name').text().trim();
+            //TODO: Add remaining player attributes
+        });
+
+        setTimeout(function () {
+            console.log('Waiting...');
+            playerCallback();
+        }, 2000);
+    },
+        function (err) {
+            if (err) {
+                return console.log(err);
+            }
+
+            callback(null);
+        });
 }
 
 function main() {
