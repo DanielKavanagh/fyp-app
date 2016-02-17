@@ -77,7 +77,7 @@ function getTeamRosters(teamArray, callback) {
                 }
             });
 
-            //Wait 2 seconds to prevent being blocked by nfl.com
+            //Wait 5 seconds to prevent being blocked by nfl.com
             setTimeout(function () {
                 teamCallback();
             }, 5000);
@@ -109,7 +109,7 @@ function getPlayers(playerArray, callback) {
             var $ = cheerio.load(body);
 
             playerObj.player_name = $('.player-name').text().trim();
-            //TODO: Add remaining player attributes
+            //TODO: Add\remaining player attributes
         });
 
         setTimeout(function () {
