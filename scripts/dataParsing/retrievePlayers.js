@@ -80,7 +80,7 @@ function getTeamRosters(teamArray, callback) {
             //Wait 5 seconds to prevent being blocked by nfl.com
             setTimeout(function () {
                 teamCallback();
-            }, 5000);
+            }, 2500);
         });
     },
         function (err) {
@@ -99,7 +99,6 @@ function getTeamRosters(teamArray, callback) {
 function getPlayers(playerArray, callback) {
     async.eachLimit(playerArray, 1, function (player, playerCallback) {
         var playerObj = {};
-
         console.log('Request: ' + baseProfileURL + player);
         request(baseProfileURL + player, function (err, response, body) {
             if (err) {
@@ -108,14 +107,23 @@ function getPlayers(playerArray, callback) {
 
             var $ = cheerio.load(body);
 
-            playerObj.player_name = $('.player-name').text().trim();
-            //TODO: Add\remaining player attributes
+            console.log(typeof player);
+
+            connection.query('SELECT team_id FROM team WHERE team_abbr = ?', [$('#playerTeam').attr('content')], function (err, result) {
+                playerObj.player_id = parseInt(player);
+                playerObj.team_id = result[0].team_id;
+                playerObj.player_name = $('.player-name').text().trim();
+                console.log(playerObj);
+
+
+                setTimeout(function () {
+                    console.log('Waiting...');
+                    playerCallback();
+                }, 2000);
+            });
         });
 
-        setTimeout(function () {
-            console.log('Waiting...');
-            playerCallback();
-        }, 2000);
+
     },
         function (err) {
             if (err) {
