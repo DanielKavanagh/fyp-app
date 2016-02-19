@@ -113,13 +113,29 @@ function getPlayers(playerArray, callback) {
                 playerObj.player_id = parseInt(player);
                 playerObj.team_id = result[0].team_id;
                 playerObj.player_name = $('.player-name').text().trim();
-                console.log(playerObj);
+                var playerNumber = $('.player-number').text().trim().split(' ');
+                playerObj.player_position = playerNumber[1];
+                var dobString = $('.player-info').children('p').eq(3).text().trim().split(' ');
+                playerObj.player_dob = dobString[1];
+                var physicalString = $('.player-info').children('p').eq(2).text().trim().split(' ');
+                playerObj.player_weight_lb = parseInt(physicalString[4], 10);
+                var heightString = physicalString[1].trim().split('-');
+                playerObj.player_height_cm = Math.round((parseInt(heightString[0], 10) * 30.48) + parseInt(heightString[1] * 2.54, 10));
+                var playerCollege = $('.player-info').children('p').eq(4).text().trim().split(' ');
+                playerObj.player_college = playerCollege[1];
+                var playerExperience = $('.player-info').children('p').eq(5).text().trim().split(' ');
+                if (playerExperience[1] === 'Rookie') {
+                    playerObj.player_years_exp = 0;
+                } else {
+                    playerObj.player_years_exp = parseInt(playerExperience[1], 10);
+                }
 
+                console.log(playerObj);
 
                 setTimeout(function () {
                     console.log('Waiting...');
                     playerCallback();
-                }, 2000);
+                }, 1500);
             });
         });
 
