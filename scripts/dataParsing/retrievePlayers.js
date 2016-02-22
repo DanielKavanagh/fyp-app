@@ -6,12 +6,13 @@
 
 'use strict';
 
-/* Import dependencies */
+//Import dependencies
 var request     = require('request');
 var async       = require('async');
 var mysql       = require('mysql');
 var cheerio     = require('cheerio');
 
+//Initialise database connection
 var connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -36,7 +37,7 @@ var baseRosterURL = 'http://www.nfl.com/teams/roster?team=';
  * @param {function} callback - Callback which sends the async waterfall to the next function
  * @return {string[]} teamList - Array containing team abbreviations*/
 function getTeams(callback) {
-    connection.query('SELECT team_id, team_abbr FROM team WHERE team_abbr = "PHI"', function (err, teamArray) {
+    connection.query('SELECT team_id, team_abbr FROM team WHERE team_abbr != "UNK"', function (err, teamArray) {
         if (err) {
             return console.log(err);
         }
@@ -54,8 +55,6 @@ function getTeams(callback) {
  * The player profile identifiers are then scraped from the HTML and returned.
  * @param {string[]} teamList - Array containing team abbreviations*/
 function getTeamRosters(teamArray, callback) {
-    var playerObj = {};
-
     async.eachLimit(teamArray, 1, function (team, teamCallback) {
         console.log('Doing Request');
         request(baseRosterURL + team.team_abbr, function (err, response, body) {
@@ -64,6 +63,7 @@ function getTeamRosters(teamArray, callback) {
             }
 
             var $ = cheerio.load(body);
+            var playerObj = {};
 
             $('#team-stats-wrapper').children('#result').children().last('tbody').children().each(function () {
 
@@ -106,15 +106,13 @@ function getTeamRosters(teamArray, callback) {
                                 throw err;
                             });
                         }
-
-                        teamCallback();
                     });
 
             });
 
-
-
-
+            setTimeout(function () {
+                teamCallback();
+            }, 2500);
         });
     },
         function (err) {
@@ -126,69 +124,10 @@ function getTeamRosters(teamArray, callback) {
         });
 }
 
-/**
- * Using an array of player profile strings, retrieve the player information from nfl.com,
- * and insert it into the database.
- * @param {string[]} playerArray - Array of player profile identifiers */
-//function getPlayers(playerArray, callback) {
-//    async.eachLimit(playerArray, 1, function (player, playerCallback) {
-//        var playerObj = {};
-//        console.log('Request: ' + baseProfileURL + player);
-//        request(baseProfileURL + player, function (err, response, body) {
-//            if (err) {
-//                return console.log(err);
-//            }
-//
-//            var $ = cheerio.load(body);
-//
-//            console.log(typeof player);
-//
-//            connection.query('SELECT team_id FROM team WHERE team_abbr = ?', [$('#playerTeam').attr('content')], function (err, result) {
-//                playerObj.player_id = parseInt(player);
-//                playerObj.team_id = result[0].team_id;
-//                playerObj.player_name = $('.player-name').text().trim();
-//                var playerNumber = $('.player-number').text().trim().split(' ');
-//                playerObj.player_position = playerNumber[1];
-//                var dobString = $('.player-info').children('p').eq(3).text().trim().split(' ');
-//                playerObj.player_dob = dobString[1];
-//                var physicalString = $('.player-info').children('p').eq(2).text().trim().split(' ');
-//                playerObj.player_weight_lb = parseInt(physicalString[4], 10);
-//                var heightString = physicalString[1].trim().split('-');
-//                playerObj.player_height_cm = Math.round((parseInt(heightString[0], 10) * 30.48) + parseInt(heightString[1] * 2.54, 10));
-//                var playerCollege = $('.player-info').children('p').eq(4).text().trim().split(' ');
-//                playerObj.player_college = playerCollege[1];
-//                var playerExperience = $('.player-info').children('p').eq(5).text().trim().split(' ');
-//                if (playerExperience[1] === 'Rookie') {
-//                    playerObj.player_years_exp = 0;
-//                } else {
-//                    playerObj.player_years_exp = parseInt(playerExperience[1], 10);
-//                }
-//
-//                console.log(playerObj);
-//
-//                setTimeout(function () {
-//                    console.log('Waiting...');
-//                    playerCallback();
-//                }, 1500);
-//            });
-//        });
-//
-//
-//    },
-//        function (err) {
-//            if (err) {
-//                return console.log(err);
-//            }
-//
-//            callback(null);
-//        });
-//}
-
 function main() {
     async.waterfall([
         getTeams,
         getTeamRosters
-        //getPlayers
     ],
         function (err) {
             if (err) {

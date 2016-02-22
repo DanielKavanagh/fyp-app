@@ -11,27 +11,8 @@
 var request = require('request');
 var async = require('async');
 var fs = require('fs');
-var path = require('path');
 var mkdirp = require('mkdirp');
 var parseString = require('xml2js').parseString;
-
-function main() {
-    if (process.argv.length !== 3) {
-        console.log('A season must be specified (2009 - 2015)');
-        return;
-    }
-
-    async.waterfall([
-        async.apply(getEIDs, process.argv[2]),
-        getGameData
-    ], function (err) {
-        if (err) {
-            console.log('Error: ' + err);
-        } else {
-            console.log('Finished!');
-        }
-    });
-}
 
 function getEIDs(season, getEIDCallback) {
     var weekIndex = 0, seasonArray = [];
@@ -54,8 +35,11 @@ function getEIDs(season, getEIDCallback) {
 
                 /*Add game EIDs to eidArray*/
                 parseString(body, function (err, result) {
-                    async.each(result.ss.gms[0].g, function (id, callback) {
+                    if (err) {
+                        return console.log(err);
+                    }
 
+                    async.each(result.ss.gms[0].g, function (id, callback) {
                         eidArray.push(id.$.eid);
                         callback();
                     });
@@ -92,7 +76,7 @@ function getGameData(seasonArray, season, getGameCallback) {
         async.eachLimit(obj.eids, 1, function (weekObj, innerCallback) {
             console.log('Getting:\t' + weekObj);
             request('http://www.nfl.com/liveupdate/game-center/' + weekObj + '/' + weekObj + '_gtd.json', function (err, resp, body) {
-                if (!err && resp.statusCode == 200) {
+                if (!err) {
                     console.log('Got:\t\t' + weekObj);
                     var jsonObj = JSON.parse(body);
 
@@ -103,9 +87,9 @@ function getGameData(seasonArray, season, getGameCallback) {
                             fs.writeFile('/home/vagrant/fyp/fyp-app/jsonData/' + season + '/week_' + obj.week + '/' + Object.keys(jsonObj)[0], body, { flags: 'wx' }, function (err) {
                                 if (err) {
                                     return console.log('Error: ' + err);
-                                } else {
-                                    console.log('Saved:\t\t' + weekObj);
                                 }
+
+                                console.log('Saved:\t\t' + weekObj);
                             });
                         }
                     });
@@ -131,6 +115,24 @@ function getGameData(seasonArray, season, getGameCallback) {
         }
 
         getGameCallback();
+    });
+}
+
+function main() {
+    if (process.argv.length !== 3) {
+        console.log('A season must be specified (2009 - 2015)');
+        return;
+    }
+
+    async.waterfall([
+        async.apply(getEIDs, process.argv[2]),
+        getGameData
+    ], function (err) {
+        if (err) {
+            console.log('Error: ' + err);
+        } else {
+            console.log('Finished!');
+        }
     });
 }
 
