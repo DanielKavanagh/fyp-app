@@ -11,7 +11,6 @@
 var async = require('async');
 var mysql = require('mysql');
 var fs = require('fs');
-var Game = require('../../models/game.js');
 
 var connection = mysql.createConnection({
     host: 'localhost',
@@ -70,40 +69,196 @@ function readDirectory(directory, callback) {
  * about the schema and table associations*/
 function insertGameData(gameArray, callback) {
     async.each(gameArray, function (game, gameCallback) {
-        var gameRef = game[Object.keys(game)[0]];
-
+        var gameRef = game[Object.keys(game)[0]], gameObj = {};
         //TODO: Insert data into game table
-        var game = new Game(game);
+        async.series([
+            function (callback) {
+                connection.query('SELECT team_id FROM team ' +
+                    'WHERE team_abbr = ?', [gameRef.home.abbr],
+                    function (err, results) {
+                        if (err) {
+                            return console.log(err);
+                        }
 
-        //Convert the drive objects into an array which can be iterated over
-        var driveArr = Object.keys(gameRef.drives).map(function (k) {
-            return gameRef.drives[k];
-        });
+                        if (results.length !== 1) {
+                            return console.log('More than one team_id returned (Check Database)');
+                        }
 
-        driveArr.pop();
+                        gameObj.game_eid = parseInt(Object.keys(game)[0], 10);
+                        gameObj.home_team_id = results[0].team_id;
+                        gameObj.home_score_final = gameRef.home.score.T;
+                        gameObj.home_score_q1 = gameRef.home.score['1'];
+                        gameObj.home_score_q2 = gameRef.home.score['2'];
+                        gameObj.home_score_q3 = gameRef.home.score['3'];
+                        gameObj.home_score_q4 = gameRef.home.score['4'];
+                        gameObj.home_score_q5 = gameRef.home.score['5'];
+                        gameObj.home_total_fds = gameRef.home.stats.team.totfd;
+                        gameObj.home_total_yds = gameRef.home.stats.team.totyds;
+                        gameObj.home_total_pass_yards = gameRef.home.stats.team.pyds;
+                        gameObj.home_total_rush_yards = gameRef.home.stats.team.ryds;
+                        gameObj.home_total_pens = gameRef.home.stats.team.pen;
+                        gameObj.home_total_pen_yards = gameRef.home.stats.team.penyds;
+                        gameObj.home_time_of_pos = gameRef.home.stats.team.top;
+                        gameObj.home_turnovers = gameRef.home.stats.team.trnovr;
+                        gameObj.home_total_punts = gameRef.home.stats.team.pt;
+                        gameObj.home_total_punt_yards = gameRef.home.stats.team.ptyds;
+                        gameObj.home_total_punt_avg = gameRef.home.stats.team.ptavg;
 
-        async.each(driveArr, function (drive, driveCallback) {
-            //TODO: Insert data into the drive table
+                        callback(null);
 
-            var playArr = Object.keys(drive.plays).map(function (k) {
-                return drive.plays[k];
-            });
-
-            async.each(playArr, function (play, playCallback) {
-                //TODO: Insert data into play table
-                console.log(play.desc);
+                    });
             },
-                function (err) {
+            function (callback) {
+                connection.query('SELECT team_id FROM team ' +
+                    'WHERE team_abbr = ?', [gameRef.away.abbr],
+                    function (err, results) {
+                        if (err) {
+                            return console.error(err);
+                        }
+
+                        if (results.length !== 1) {
+                            return console.error('More than one team_id returned (Check Database)');
+                        }
+
+                        gameObj.away_team_id = results[0].team_id;
+                        gameObj.away_score_final = gameRef.away.score.T;
+                        gameObj.away_score_q1 = gameRef.away.score['1'];
+                        gameObj.away_score_q2 = gameRef.away.score['2'];
+                        gameObj.away_score_q3 = gameRef.away.score['3'];
+                        gameObj.away_score_q4 = gameRef.away.score['4'];
+                        gameObj.away_score_q5 = gameRef.away.score['5'];
+                        gameObj.away_total_fds = gameRef.away.stats.team.totfd;
+                        gameObj.away_total_yds = gameRef.away.stats.team.totyds;
+                        gameObj.away_total_pass_yards = gameRef.away.stats.team.pyds;
+                        gameObj.away_total_rush_yards = gameRef.away.stats.team.ryds;
+                        gameObj.away_total_pens = gameRef.away.stats.team.pen;
+                        gameObj.away_total_pen_yards = gameRef.away.stats.team.penyds;
+                        gameObj.away_time_of_pos = gameRef.away.stats.team.top;
+                        gameObj.away_turnovers = gameRef.away.stats.team.trnovr;
+                        gameObj.away_total_punts = gameRef.away.stats.team.pt;
+                        gameObj.away_total_punt_yards = gameRef.away.stats.team.ptyds;
+                        gameObj.away_total_punt_avg = gameRef.away.stats.team.ptavg;
+
+                        callback();
+                    });
+            },
+            function (callback) {
+                connection.query('INSERT IGNORE INTO game SET ?', gameObj, function (err) {
                     if (err) {
-                        return console.log(err);
+                        return connection.rollback(function () {
+                            throw err;
+                        });
                     }
 
-                    driveCallback();
+                    callback();
                 });
-        },
-            function (err) {
+            },
+            function (callback) {
+                var driveArr = Object.keys(gameRef.drives).map(function (k) {
+                    return gameRef.drives[k];
+                });
+
+                driveArr.pop();
+
+                var gameID, driveObj = {}, driveID = 1;
+
+                connection.query('SELECT game_id FROM game WHERE game_eid = ?',
+                    [gameObj.game_eid], function (err, results) {
+                        if (err) {
+                            return console.error(err);
+                        }
+
+                        if (results.length !== 1) {
+                            return console.error('More than one result returned');
+                        }
+
+                        gameID = results[0].game_id;
+
+                    });
+
+                console.log(driveArr);
+
+                async.each(driveArr, function (drive, driveCallback) {
+                    //TODO: Insert data into the drive table
+                    async.series([
+                        function (callback) {
+                            connection.query('SELECT team_id FROM team ' +
+                                'WHERE team_abbr = ?', [drive.posteam],
+                                function (err, results) {
+                                    if (err) {
+                                        return console.error(err);
+                                    }
+
+                                    if (results.length !== 1) {
+                                        return console.error('More than one returned');
+                                    }
+
+                                    driveObj.game_id = gameID;
+                                    driveObj.drive_id = driveID;
+                                    driveObj.team_id = results[0].team_id;
+
+                                    driveObj.drive_pos_time = drive.postime;
+                                    driveObj.drive_total_plays = drive.numplays;
+                                    driveObj.drive_first_downs = drive.fds;
+                                    driveObj.drive_yards_gained = drive.ydsgained;
+                                    driveObj.drive_yards_pen = drive.penyds;
+                                    driveObj.drive_result = drive.result;
+
+                                    driveObj.drive_start_time = drive.start.time;
+                                    driveObj.drive_start_quarter = drive.start.qtr;
+                                    driveObj.drive_start_position = drive.start.yrdln;
+
+                                    driveObj.drive_end_time = drive.end.time;
+                                    driveObj.drive_end_quarter = drive.end.qtr;
+                                    driveObj.drive_end_position = drive.end.yrdln;
+
+                                    driveID++;
+                                    callback();
+
+                                });
+                        },
+                        function (callback) {
+                            connection.query('INSERT INTO drive SET ?', driveObj, function (err) {
+                                if (err) {
+                                    return console.error(err);
+                                }
+
+                                callback();
+                            });
+                        },
+                        function () {
+                            var playArr = Object.keys(drive.plays).map(function (k) {
+                                return drive.plays[k];
+                            });
+
+                            async.each(playArr, function (play, playCallback) {
+
+                                //TODO: Insert data into play table
+                                playCallback();
+                            },
+                                function (err) {
+                                    if (err) {
+                                        return console.log(err);
+                                    }
+
+                                    driveCallback();
+                                });
+                        }
+                    ]);
+
+
+                },
+                    function (err) {
+                        if (err) {
+                            return console.log(err);
+                        }
+
+                        callback();
+                    });
+            }],
+            function (err, result) {
                 if (err) {
-                    return console.log(err);
+                    return console.error(err);
                 }
 
                 gameCallback();
@@ -130,9 +285,9 @@ function main() {
     }
 
     async.waterfall([
-        async.apply(readDirectory, process.argv[2]),
-        insertGameData
-    ],
+            async.apply(readDirectory, process.argv[2]),
+            insertGameData
+        ],
         function (err) {
             if (err) {
                 return console.log(err);
