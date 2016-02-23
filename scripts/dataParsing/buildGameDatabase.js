@@ -11,6 +11,7 @@
 var async = require('async');
 var mysql = require('mysql');
 var fs = require('fs');
+var Game = require('../../models/game.js');
 
 var connection = mysql.createConnection({
     host: 'localhost',
@@ -68,17 +69,54 @@ function readDirectory(directory, callback) {
  * tables. Refer to https://github.com/DanielKavanagh/fyp-db for details
  * about the schema and table associations*/
 function insertGameData(gameArray, callback) {
-    //foreach game in array, insert into game table
     async.each(gameArray, function (game, gameCallback) {
+        var gameRef = game[Object.keys(game)[0]];
 
+        //TODO: Insert data into game table
+        var game = new Game(game);
+
+        //Convert the drive objects into an array which can be iterated over
+        var driveArr = Object.keys(gameRef.drives).map(function (k) {
+            return gameRef.drives[k];
+        });
+
+        driveArr.pop();
+
+        async.each(driveArr, function (drive, driveCallback) {
+            //TODO: Insert data into the drive table
+
+            var playArr = Object.keys(drive.plays).map(function (k) {
+                return drive.plays[k];
+            });
+
+            async.each(playArr, function (play, playCallback) {
+                //TODO: Insert data into play table
+                console.log(play.desc);
+            },
+                function (err) {
+                    if (err) {
+                        return console.log(err);
+                    }
+
+                    driveCallback();
+                });
+        },
+            function (err) {
+                if (err) {
+                    return console.log(err);
+                }
+
+                gameCallback();
+            });
     },
         function (err) {
             if (err) {
                 return console.log(err);
             }
+
+            callback();
         });
 }
-
 
 /**
  * Controls the async functions, and parses the command line arguments
@@ -99,8 +137,16 @@ function main() {
             if (err) {
                 return console.log(err);
             }
-        });
 
+            /*Close DB connection*/
+            connection.end(function (err) {
+                if (err) {
+                    return console.log(err);
+                }
+
+                return console.log('Database Connection Closed...');
+            });
+        });
 }
 
 main();
