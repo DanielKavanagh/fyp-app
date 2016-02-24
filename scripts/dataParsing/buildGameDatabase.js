@@ -232,7 +232,7 @@ function insertGameData(gameArray, callback) {
                             });
 
                             async.each(playArr, function (play, playCallback) {
-
+                                console.log(play);
                                 //TODO: Insert data into play table
                                 playCallback();
                             },
