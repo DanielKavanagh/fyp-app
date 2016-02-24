@@ -226,7 +226,7 @@ function insertGameData(gameArray, callback) {
                                 callback();
                             });
                         },
-                        function () {
+                        function (callback) {
                             var playArr = Object.keys(drive.plays).map(function (k) {
                                 return drive.plays[k];
                             });
