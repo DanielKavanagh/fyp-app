@@ -129,11 +129,18 @@ function insertGameData(gameArray, callback) {
                         if (err) {
                             return console.log(err);
                         }
-
-                        //console.log(result);
                     });
 
-                    gameCallback();
+                    async.each(game.drives, function (drive, driveCallback) {
+                        console.log(gameObj.game_eid + ' ' + drive.posteam);
+                    }, function (err, results) {
+                        if (err) {
+                            return console.log(err);
+                        }
+
+
+                        gameCallback();
+                    });
                 });
         }, function (err, results) {
             if (err) {
@@ -145,13 +152,6 @@ function insertGameData(gameArray, callback) {
     });
 }
 
-function insertDriveData() {
-
-}
-
-function insertPlayData() {
-
-}
 
 /**
  * Controls the async functions, and parses the command line arguments
