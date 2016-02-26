@@ -176,8 +176,6 @@ function insertGameData(gameArray, callback) {
 
                     });
 
-                console.log(driveArr);
-
                 async.each(driveArr, function (drive, driveCallback) {
                     //TODO: Insert data into the drive table
                     async.series([
@@ -232,8 +230,9 @@ function insertGameData(gameArray, callback) {
                             });
 
                             async.each(playArr, function (play, playCallback) {
-                                console.log(play);
+                                
                                 //TODO: Insert data into play table
+                                console.log(play);
                                 playCallback();
                             },
                                 function (err) {

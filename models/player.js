@@ -29,8 +29,6 @@ method.getAttribute = function (attribute) {
     return this[attribute];
 };
 
-method
-
 method.setAttribute = function (attribute, value) {
     this[attribute] = value;
 };
