@@ -162,4 +162,119 @@ statMap.set(24, {
     description: 'Receiving yards with no reception, resulting in a touchdown'
 });
 
+statMap.set(25, {
+    category: 'defence',
+    fields: ['defence_int'],
+    yards: 'defence_int_yds',
+    description: 'Interception and yards'
+});
+
+statMap.set(26, {
+    category: 'defence',
+    fields: ['defence_int', 'defence_int_tds'],
+    yards: 'defence_int_yds',
+    description: 'Interception and yards, resulting in a touchdown'
+});
+
+statMap.set(27, {
+    category: 'defence',
+    fields: [],
+    yards: 'defence_int_yds',
+    description: 'Interception yards, no interception (i.e. after a lateral)'
+});
+
+statMap.set(28, {
+    category: 'defence',
+    fields: ['defence_int_tds'],
+    yards: 'defence_int_yds',
+    description: 'Interception yards, no interception, resulting in a touchdown'
+});
+
+statMap.set(29, {
+    category: 'punting',
+    fields: ['punting_total'],
+    yards: 'punting_yds',
+    description: 'Punting yards, not used if a touchback, ' +
+        'received in endzone, or blocked'
+});
+
+statMap.set(30, {
+    category: 'punting',
+    fields: ['punting_inside_20'],
+    yards: '',
+    description: 'Punt, where the return ended within the opponent\'s 20yd line'
+});
+
+statMap.set(31, {
+    category: 'punting',
+    fields: ['punting_total'],
+    yards: 'punting_yds',
+    description: 'Punt into endzone, returned'
+});
+
+statMap.set(32, {
+    category: 'punting',
+    fields: ['punting_total', 'punting_touchback'],
+    yards: 'punting_yds',
+    description: 'Punt, resulting in a touchback'
+});
+
+statMap.set(33, {
+    category: 'puntret',
+    fields: ['puntret_total'],
+    yards: 'puntret_yds',
+    description: 'Punt return and yards'
+});
+
+statMap.set(34, {
+    category: 'puntret',
+    fields: ['puntret_total', 'puntret_tds'],
+    yards: 'puntret_yds',
+    description: 'Punt return and yards, resulting in a touchdown'
+});
+
+statMap.set(35, {
+    category: 'puntret',
+    fields: [],
+    yards: 'puntret_yds',
+    description: 'Punt return yards, no return ' +
+        '(i.e. after the ball is lateraled to another player)'
+});
+
+statMap.set(36, {
+    category: 'puntret',
+    fields: ['puntret_tds'],
+    yards: 'puntret_yds',
+    description: 'Punt return yards, no return, resulting in a touchdown' +
+        '(i.e. after the ball is lateraled to another player)'
+});
+
+statMap.set(37, {
+    category: 'team',
+    fields: ['puntret_oob'],
+    yards: '',
+    description: 'Punt went out of bounds (no return)'
+});
+
+statMap.set(38, {
+    category: 'team',
+    fields: ['puntret_downed'],
+    yards: '',
+    description: 'Punt return downed by kicking team (no return)'
+});
+
+statMap.set(39, {
+    category: 'puntret',
+    fields: ['puntret_faircatch'],
+    yards: '',
+    description: 'Punt resulting in a faircatch'
+});
+
+statMap.set(40, {
+    category: 'team',
+    fields: ['puntret_touchback'],
+    yards: 'puntret_yds',
+    description: 'Punt resulting in a touchback (no return)'
+});
+
 module.exports = statMap;
