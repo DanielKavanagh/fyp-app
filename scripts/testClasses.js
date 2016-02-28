@@ -3,6 +3,7 @@
  */
 
 var Player = require('../models/player.js');
+var StatMap = require('../models/statMap.js');
 
 var player = new Player(
     {
@@ -29,3 +30,5 @@ console.log(player);
 player.setAttribute('profile_url', undefined);
 
 console.log(player);
+
+console.log(StatMap.length);

@@ -268,6 +268,8 @@ function parsePlays(gameID, gamePlays, callback) {
 
         playID++;
 
+
+
         console.log(playObj);
 
         connection.query('INSERT INTO play SET ?', [playObj], function (err, result) {
@@ -277,6 +279,10 @@ function parsePlays(gameID, gamePlays, callback) {
 
             callback();
         });
+    }, function (err, results) {
+        if (err) {
+            return console.log(err);
+        }
     });
 
 }
