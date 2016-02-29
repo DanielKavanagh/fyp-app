@@ -277,4 +277,234 @@ statMap.set(40, {
     description: 'Punt resulting in a touchback (no return)'
 });
 
+statMap.set(41, {
+    category: 'kicking',
+    fields: ['kicking_total'],
+    yards: 'kicking_yds',
+    description: 'Kickoff and yards'
+});
+
+statMap.set(42, {
+    category: 'kicking',
+    fields: ['kicking_inside_20'],
+    yards: '',
+    description: 'Kickoff where the return ended within the opponents ' +
+        '20 yard line (does not count toward kicking yards )'
+});
+
+statMap.set(43, {
+    category: 'kicking',
+    fields: ['kicking_total'],
+    yards: 'kicking_yds',
+    description: 'Kickoff and yards (received in endzone and returned))'
+});
+
+statMap.set(44, {
+    category: 'kicking',
+    fields: ['kicking_total', 'kicking_touchback'],
+    yards: 'kicking_yds',
+    description: 'Kickoff and yards resulting in a touchback'
+});
+
+statMap.set(45, {
+    category: 'kickret',
+    fields: ['kickret_return'],
+    yards: 'kickret_yds',
+    description: 'Kickoff return and yards'
+});
+
+statMap.set(46, {
+    category: 'kickret',
+    fields: ['kickret_return', 'kickret_tds'],
+    yards: 'kickret_yds',
+    description: 'Kickoff return and yards, resulting in a touchdown'
+});
+
+statMap.set(47, {
+    category: 'kickret',
+    fields: [],
+    yards: 'kickret_yds',
+    description: 'Kickoff return and yards, with no return ' +
+        '(i.e. after the ball is lateraled to another player)'
+});
+
+statMap.set(48, {
+    category: 'kickret',
+    fields: ['kickret_tds'],
+    yards: 'kickret_yds',
+    description: 'Kickoff return and yards (no return), resulting ' +
+        'in a touchdown'
+});
+
+statMap.set(49, {
+    category: 'team',
+    fields: ['kickret_oob'],
+    yards: '',
+    description: 'Kickoff that went out of bounds'
+});
+
+statMap.set(50, {
+    category: 'kickret',
+    fields: ['kickret_fair_catch'],
+    yards: '',
+    description: 'Kickoff resulting in a fair catch'
+});
+
+statMap.set(51, {
+    category: 'team',
+    fields: ['kickret_touchback'],
+    yards: '',
+    description: 'Kickoff return, resulting in a touchdown'
+});
+
+statMap.set(52, {
+    category: 'fumbles',
+    fields: ['fumble_total', 'fumble_forced'],
+    yards: '',
+    description: 'Ball was fumbled (forced by another player)'
+});
+
+statMap.set(53, {
+    category: 'fumbles',
+    fields: ['fumble_total', 'fumble_unforced'],
+    yards: '',
+    description: 'Ball was fumbled (not forced by another player)'
+});
+
+statMap.set(54, {
+    category: 'fumbles',
+    fields: ['fumble_oob'],
+    yards: '',
+    description: 'Ball was fumbled (ball went out of bounds)'
+});
+
+statMap.set(55, {
+    category: 'fumbles',
+    fields: ['fumble_rec'],
+    yards: 'fumble_rec_yds',
+    description: 'Fumble and yards lost/gained by a player who ' +
+        'recovered a fumble by their own team'
+});
+
+statMap.set(56, {
+    category: 'fumbles',
+    fields: ['fumble_rec', 'fumble_rec_tds'],
+    yards: 'fumble_rec_yds',
+    description: 'Fumble and yards lost/gained by a player who ' +
+        'recovered a fumble by their own team (resulting in a touchdown)'
+});
+
+statMap.set(57, {
+    category: 'fumbles',
+    fields: [],
+    yards: 'fumble_rec_yds',
+    description: 'Yards gained by a player who received a lateral ' +
+        'after the ball was recovered by the fumbling team'
+});
+
+statMap.set(58, {
+    category: 'fumbles',
+    fields: ['fumble_rec_tds'],
+    yards: 'fumble_rec_yds',
+    description: 'Yards gained by a player who received a lateral ' +
+        'after the ball was recovered by the fumbling team ' +
+        '(resulting in a touchdown)'
+});
+
+statMap.set(59, {
+    category: 'defence',
+    fields: ['defence_fum_rec'],
+    yards: 'defence_fum_rec_yds',
+    description: 'Yards gained/lost by the player who recovered a ' +
+        'fumble by the opposing team'
+});
+
+statMap.set(60, {
+    category: 'defence',
+    fields: ['defence_fum_rec', 'defence_fum_rec_tds'],
+    yards: 'defence_fum_rec_yds',
+    description: 'Yards gained/lost by the player who recovered a ' +
+        'fumble by the opposing team (resulting in a touchdown)'
+});
+
+statMap.set(61, {
+    category: 'defence',
+    fields: [],
+    yards: 'defence_fum_rec_yds',
+    description: 'Fumble recovery by opposing team, with yards, no recovery' +
+        '(i.e. the player receives a lateral)'
+});
+
+
+statMap.set(62, {
+    category: 'defence',
+    fields: ['defence_fum_rec_tds'],
+    yards: 'defence_fum_rec_yds',
+    description: 'Fumble recovery by opposing team, with yards, no recovery' +
+        '(i.e. the player receives a lateral) resulting in a touchdown'
+});
+
+statMap.set(63, {
+    category: 'defence',
+    fields: [],
+    yards: 'defence_misc_yds',
+    description: 'Defence yards that doesn\'t fit into any other category'
+});
+
+statMap.set(64, {
+    category: 'defence',
+    fields: ['defence_misc_tds'],
+    yards: 'defence_misc_yds',
+    description: 'Miscellaneous defence yards, resulting in a touchdown'
+});
+
+statMap.set(68, {
+    category: 'team',
+    fields: ['timeout'],
+    yards: '',
+    description: 'Team took a timeout'
+});
+
+statMap.set(69, {
+    category: 'kicking',
+    fields: ['kicking_fg_att', 'kicking_fg_miss'],
+    yards: 'kicking_fg_miss_yds',
+    description: 'Field goal miss with yards'
+});
+
+statMap.set(70, {
+    category: 'kicking',
+    fields: ['kicking_fg_att', 'kicking_fg_cmp'],
+    yards: 'kicking_fg_cmp_yds',
+    description: 'Field goal completion with yards'
+});
+
+statMap.set(71, {
+    category: 'kicking',
+    fields: ['kicking_fg_att', 'kicking_fg_miss', 'kicking_fg_blk'],
+    yards: 'kicking_fg_miss_yds',
+    description: 'Field goal with attempted yards that was blocked'
+});
+
+statMap.set(72, {
+    category: 'kicking',
+    fields: ['kicking_xp_att', 'kicking_xp_cmp'],
+    yards: '',
+    description: 'Extra point attempt success'
+});
+
+statMap.set(73, {
+    category: 'kicking',
+    fields: ['kicking_xp_att', 'kicking_xp_miss'],
+    yards: '',
+    description: 'Extra point attempt miss'
+});
+
+statMap.set(74, {
+    category: 'kicking',
+    fields: ['kicking_xp_att', 'kicking_xp_miss', 'kicking_xp_blk'],
+    yards: '',
+    description: 'Extra point blocked'
+});
+
 module.exports = statMap;
