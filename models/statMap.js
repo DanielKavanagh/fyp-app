@@ -507,4 +507,240 @@ statMap.set(74, {
     description: 'Extra point blocked'
 });
 
+statMap.set(75, {
+    category: 'rushing',
+    fields: ['rushing_twopt_att', 'rushing_twopt_cmp'],
+    yards: '',
+    description: 'Two point attempt rush made'
+});
+
+statMap.set(76, {
+    category: 'rushing',
+    fields: ['rushing_twopt_att', 'rushing_twopt_fail'],
+    yards: '',
+    description: 'Two point attempt rush failed'
+});
+
+statMap.set(77, {
+    category: 'passing',
+    fields: ['passing_twopt_att', 'passing_twopt_cmp'],
+    yards: '',
+    description: 'Two point attempt pass made'
+});
+
+statMap.set(78, {
+    category: 'passing',
+    fields: ['passing_twopt_att', 'passing_twopt_fail'],
+    yards: '',
+    description: 'Two point attempt pass failed'
+});
+
+statMap.set(79, {
+    category: 'defence',
+    fields: ['defence_tkl'],
+    yards: '',
+    description: 'Defensive tackle, no assist'
+});
+
+statMap.set(80, {
+    category: 'defence',
+    fields: ['defence_tkl', 'defence_tkl_primary'],
+    yards: '',
+    description: 'Defensive tackle, one or more assists'
+});
+
+statMap.set(82, {
+    category: 'defence',
+    fields: ['defence_tkl_ast'],
+    yards: '',
+    description: 'Assist to a tackle'
+});
+
+statMap.set(83, {
+    category: 'defence',
+    fields: ['defence_sack'],
+    yards: 'defence_sack_yds',
+    description: 'Unassisted sack, with yards'
+});
+
+statMap.set(84, {
+    category: 'defence',
+    fields: ['defence_sack'],
+    yards: 'defence_sack_yds',
+    description: '1/2 Sack (Split between two players)'
+});
+
+statMap.set(85, {
+    category: 'defence',
+    fields: ['defence_pass_def'],
+    yards: '',
+    description: 'Pass disrupted/blocked by a defensive player'
+});
+
+statMap.set(86, {
+    category: 'defence',
+    fields: ['defence_punt_blk'],
+    yards: '',
+    description: 'Player blocked a punt'
+});
+
+statMap.set(87, {
+    category: 'defence',
+    fields: ['defence_xp_block'],
+    yards: '',
+    description: 'Player blocked an extra point attempt'
+});
+
+statMap.set(88, {
+    category: 'defence',
+    fields: ['defence_fg_blk'],
+    yards: '',
+    description: 'Player blocked a field goal attempt'
+});
+
+statMap.set(89, {
+    category: 'defence',
+    fields: ['defence_safety'],
+    yards: '',
+    description: 'Tackle resulting in a safety ' +
+        '(recorded in addition to a tackle)'
+});
+
+statMap.set(91, {
+    category: 'defence',
+    fields: ['defence_force_fum'],
+    yards: '',
+    description: 'Player forced a fumble'
+});
+
+statMap.set(93, {
+    category: 'penalty',
+    fields: ['penalty'],
+    yards: 'penalty_yds',
+    description: 'A penalty occurred'
+});
+
+statMap.set(95, {
+    category: 'team',
+    fields: ['rushing_loss'],
+    yards: 'rushing_loss_yds',
+    description: 'Rush ended behind the line of scrimmage, ' +
+        'due to the action of a defensive player (i.e. Tackled for a Loss)'
+});
+
+statMap.set(102, {
+    category: 'team',
+    fields: ['kicking_downed'],
+    yards: '',
+    description: 'Kickoff downed by kicking team player, ' +
+        'within the 10 yard free zone'
+});
+
+statMap.set(103, {
+    category: 'passing',
+    fields: [],
+    yards: 'passing_sack_yds',
+    description: 'Player who receives a lateral from the passer, ' +
+        'who recovered a fumble (the receiving player is given sack ' +
+        'yards, but no sack)'
+});
+
+statMap.set(104, {
+    category: 'receiving',
+    fields: ['receiving_twopt_att', 'receiving_twopt_cmp'],
+    yards: '',
+    description: 'Two point pass reception (complete)'
+});
+
+statMap.set(105, {
+    category: 'receiving',
+    fields: ['receiving_twopt_att', 'receiving_twopt_fail'],
+    yards: '',
+    description: 'Two point pass attempt (incomplete)'
+});
+
+statMap.set(106, {
+    category: 'fumbles',
+    fields: ['fumbles_lost'],
+    yards: '',
+    description: 'Fumble (lost)'
+});
+
+statMap.set(107, {
+    category: 'kicking',
+    fields: ['kicking_rec'],
+    yards: '',
+    description: 'Kickoff recovered by kicking team'
+});
+
+statMap.set(108, {
+    category: 'kicking',
+    fields: ['kicking_rec', 'kicking_rec_tds'],
+    yards: '',
+    description: 'Kickoff recovered by kicking team, resulting in a touchdown'
+});
+
+statMap.set(110, {
+    category: 'defence',
+    fields: ['defence_qb_hit'],
+    yards: '',
+    description: 'Quarterback knocked to ground (without the ball)'
+});
+
+statMap.set(111, {
+    category: 'passing',
+    fields: [],
+    yards: 'passing_cmp_air_yds',
+    description: 'Length of pass in the air, complete (not including YAC)'
+});
+
+statMap.set(112, {
+    category: 'passing',
+    fields: [],
+    yards: 'passing_incmp_air_yds',
+    description: 'Length of pass in the air, incomplete (not including YAC)'
+});
+
+statMap.set(113, {
+    category: 'receiving',
+    fields: [],
+    yards: 'receiving_yac_yds',
+    description: 'Receiver yards after catch'
+});
+
+statMap.set(115, {
+    category: 'receiving',
+    fields: ['receiving_target'],
+    yards: '',
+    description: 'Player target of pass attempt'
+});
+
+statMap.set(120, {
+    category: 'defence',
+    fields: ['defence_tkl_loss'],
+    yards: '',
+    description: 'Player tackled the runner behind the LOS'
+});
+
+statMap.set(301, {
+    category: 'team',
+    fields: ['xp_aborted'],
+    yards: '',
+    description: 'Extra point attempt aborted'
+});
+
+statMap.set(402, {
+    category: 'defence',
+    fields: [],
+    yards: 'defence_tkl_loss_yds',
+    description: 'Yards lost after a tackle for a loss'
+});
+
+statMap.set(410, {
+    category: 'kicking',
+    fields: [],
+    yards: 'kicking_all_yds',
+    description: 'Complete length of a kickoff'
+});
+
 module.exports = statMap;
