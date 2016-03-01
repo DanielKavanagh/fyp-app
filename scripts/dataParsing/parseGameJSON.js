@@ -213,7 +213,23 @@ function insertGamePlays(gameId, playArr, callback) {
     var playId = 1;
 
     async.each(playArr, function (play, callback) {
-        console.log(gameId);
+        console.log(play.players);
+        //var playObj = new Play({
+        //    game_id: gameId,
+        //    drive_id: play.drive_id,
+        //    play_id: playId,
+        //    team_id: play.posteamID,
+        //    quarter: play.qtr,
+        //    down: play.down,
+        //    start_time: play.time,
+        //    yard_line: play.yrdln,
+        //    yards_to_first_down: play.ydstogo,
+        //    yards_this_drive: play.ydsnet,
+        //    play_description: play.desc,
+        //    play_note: play.note,
+        //
+        //    if('0' in play.players)
+        //});
     }, function (err) {
         if (err) {
             return console.log(err);
