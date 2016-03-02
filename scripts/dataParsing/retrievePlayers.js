@@ -122,6 +122,10 @@ function parseRosterProfiles(playerArr, callback) {
     });
 }
 
+function savePlayerJSON(playerArr, callback) {
+
+}
+
 function insertPlayers(playerArr, callback) {
     pool.getConnection(function(err, connection) {
         if (err) {
@@ -135,6 +139,7 @@ function insertPlayers(playerArr, callback) {
                 }
 
                 console.log('Inserted Player (' + player.player.player_id + ')');
+                callback();
             });
         }, function (err) {
             if (err) {
@@ -149,6 +154,7 @@ function main() {
         getTeams,
         parseTeamRoster,
         parseRosterProfiles,
+        savePlayerJSON,
         insertPlayers
     ], function (err) {
         if (err) {

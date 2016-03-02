@@ -80,11 +80,11 @@ function getGameData(seasonArray, season, getGameCallback) {
                     console.log('Got:\t\t' + weekObj);
                     var jsonObj = JSON.parse(body);
 
-                    mkdirp('/home/vagrant/fyp/fyp-app/jsonData/' + season + '/week_' + obj.week, function (err) {
+                    mkdirp('/home/vagrant/fyp/fyp-app/jsonData/games/' + season + '/week_' + obj.week, function (err) {
                         if (err) {
-                            console.log('mkdirp: ' + err);
+                            return console.log('mkdirp: ' + err);
                         } else {
-                            fs.writeFile('/home/vagrant/fyp/fyp-app/jsonData/' + season + '/week_' + obj.week + '/' + Object.keys(jsonObj)[0], body, { flags: 'wx' }, function (err) {
+                            fs.writeFile('/home/vagrant/fyp/fyp-app/jsonData/games/' + season + '/week_' + obj.week + '/' + Object.keys(jsonObj)[0], body, { flags: 'wx' }, function (err) {
                                 if (err) {
                                     return console.log('Error: ' + err);
                                 }
@@ -95,7 +95,9 @@ function getGameData(seasonArray, season, getGameCallback) {
                     });
                 }
 
-                innerCallback();
+                setTimeout(function () {
+                    innerCallback();
+                }, 1000);
             });
 
         }, function (err) {
@@ -109,7 +111,6 @@ function getGameData(seasonArray, season, getGameCallback) {
         });
 
     }, function (err) {
-
         if (err) {
             console.log(err);
         }
