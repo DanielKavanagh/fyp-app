@@ -40,14 +40,19 @@ function getEIDs(season, getEIDCallback) {
                     }
 
                     async.each(result.ss.gms[0].g, function (id, callback) {
-                        eidArray.push(id.$.eid);
+                        eidArray.push({
+                            eid: id.$.eid,
+                            time: id.$.t,
+                            type: id.$.gt
+                        });
+
                         callback();
                     });
                 });
 
                 var weekObj = {
                     week: weekIndex,
-                    eids: eidArray
+                    games: eidArray
                 };
 
                 seasonArray.push(weekObj);
@@ -70,34 +75,72 @@ function getEIDs(season, getEIDCallback) {
     );
 }
 
+function readPlayerJson(seasonArray, season, callback) {
+    fs.readFile('/home/vagrant/fyp/fyp-app/jsonData/players.json', 'utf-8', function (err, content) {
+        if (err) {
+            return console.log(err);
+        }
+
+        callback(null, seasonArray, season, JSON.parse(content));
+    });
+}
+
 /*Get the game data for each eid*/
-function getGameData(seasonArray, season, getGameCallback) {
+function getGameData(seasonArray, season, playersObj, getGameCallback) {
     async.each(seasonArray, function (obj, outerCallback) {
-        async.eachLimit(obj.eids, 1, function (weekObj, innerCallback) {
+        async.eachLimit(obj.games, 1, function (weekObj, innerCallback) {
             console.log('Getting:\t' + weekObj);
-            request('http://www.nfl.com/liveupdate/game-center/' + weekObj + '/' + weekObj + '_gtd.json', function (err, resp, body) {
+            request('http://www.nfl.com/liveupdate/game-center/' + weekObj.eid + '/' + weekObj.eid + '_gtd.json', function (err, resp, body) {
                 if (!err) {
-                    console.log('Got:\t\t' + weekObj);
-                    var jsonObj = JSON.parse(body);
+                    //console.log('Got:\t\t' + weekObj);
+                    var jsonObj = JSON.parse(body),
+                        gameRef = jsonObj[Object.keys(jsonObj)[0]];
 
-                    mkdirp('/home/vagrant/fyp/fyp-app/jsonData/games/' + season + '/week_' + obj.week, function (err) {
-                        if (err) {
-                            return console.log('mkdirp: ' + err);
-                        } else {
-                            fs.writeFile('/home/vagrant/fyp/fyp-app/jsonData/games/' + season + '/week_' + obj.week + '/' + Object.keys(jsonObj)[0], body, { flags: 'wx' }, function (err) {
-                                if (err) {
-                                    return console.log('Error: ' + err);
+                    for (var stat in gameRef.home.stats) {
+                        if (stat !== 'team') {
+                            var statObj = gameRef.home.stats[stat];
+
+                            for (var prop in statObj) {
+                                if (!(prop in playersObj)) {
+                                    playersObj[prop] = {
+                                        name: statObj[prop].name
+                                    };
                                 }
-
-                                console.log('Saved:\t\t' + weekObj);
-                            });
+                            }
                         }
+                    }
+
+                    gameRef.season = season;
+                    gameRef.week = obj.week;
+                    gameRef.time = weekObj.time;
+                    gameRef.gameType = weekObj.type;
+
+                    fs.writeFile('/home/vagrant/fyp/fyp-app/jsonData/gameJSON/' + weekObj.eid, { flags: 'wx' }, function (err) {
+                        if (err) {
+                            return console.log(err);
+                        }
+
+                        setTimeout(function () {
+                            innerCallback();
+                        }, 1000);
                     });
+
+                    //mkdirp('/home/vagrant/fyp/fyp-app/jsonData/games/' + season + '/week_' + obj.week, function (err) {
+                    //    if (err) {
+                    //        return console.log('mkdirp: ' + err);
+                    //    } else {
+                    //        fs.writeFile('/home/vagrant/fyp/fyp-app/jsonData/games/' + season + '/week_' + obj.week + '/' + Object.keys(jsonObj)[0], body, { flags: 'wx' }, function (err) {
+                    //            if (err) {
+                    //                return console.log('Error: ' + err);
+                    //            }
+                    //
+                    //            //console.log('Saved:\t\t' + weekObj);
+                    //        });
+                    //    }
+                    //});
                 }
 
-                setTimeout(function () {
-                    innerCallback();
-                }, 1000);
+
             });
 
         }, function (err) {
@@ -115,18 +158,27 @@ function getGameData(seasonArray, season, getGameCallback) {
             console.log(err);
         }
 
-        getGameCallback();
+        fs.writeFile('/home/vagrant/fyp/fyp-app/jsonData/players.json', JSON.stringify(playersObj), { flags: 'wx' }, function (err) {
+            if (err) {
+                return console.log(err);
+            }
+
+            getGameCallback();
+        });
+
+
     });
 }
 
 function main() {
     if (process.argv.length !== 3) {
-        console.log('A season must be specified (2009 - 2015)');
-        return;
+        return console.log('A season must be specified (2009 - 2015)');
+
     }
 
     async.waterfall([
         async.apply(getEIDs, process.argv[2]),
+        readPlayerJson,
         getGameData
     ], function (err) {
         if (err) {

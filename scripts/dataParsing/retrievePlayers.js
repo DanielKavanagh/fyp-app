@@ -11,6 +11,7 @@ var request = require('request');
 var async = require('async');
 var mysql = require('mysql');
 var cheerio = require('cheerio');
+var mkdirp = require('mkdirp');
 var Player = require('../../models/player.js');
 var pool = require('../../models/mysqldb.js');
 
@@ -26,7 +27,7 @@ function getTeams(callback) {
         }
 
         connection.query('SELECT team_id, team_abbr FROM team' +
-            ' WHERE team_abbr = "KC"', function (err, teams) {
+            ' WHERE team_abbr != "UNK"', function (err, teams) {
                 if (err) {
                     return console.log(err);
                 }
@@ -111,7 +112,7 @@ function parseRosterProfiles(playerArr, callback) {
             setTimeout(function() {
                 console.log('Waiting...');
                 callback();
-            }, 2500);
+            }, 3000);
         });
     }, function (err) {
         if (err) {
@@ -122,12 +123,8 @@ function parseRosterProfiles(playerArr, callback) {
     });
 }
 
-function savePlayerJSON(playerArr, callback) {
-
-}
-
 function insertPlayers(playerArr, callback) {
-    pool.getConnection(function(err, connection) {
+    pool.getConnection(function (err, connection) {
         if (err) {
             return console.log(err);
         }
@@ -145,6 +142,9 @@ function insertPlayers(playerArr, callback) {
             if (err) {
                 return console.log(err);
             }
+
+            connection.release();
+            callback(null);
         });
     });
 }
@@ -154,12 +154,13 @@ function main() {
         getTeams,
         parseTeamRoster,
         parseRosterProfiles,
-        savePlayerJSON,
         insertPlayers
     ], function (err) {
         if (err) {
             return console.log(err);
         }
+
+        return console.log('Done');
     });
 }
 
