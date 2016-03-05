@@ -90,6 +90,7 @@ function getGameData(seasonArray, season, playersObj, getGameCallback) {
     async.each(seasonArray, function (obj, outerCallback) {
         async.eachLimit(obj.games, 1, function (weekObj, innerCallback) {
             console.log('Getting:\t' + weekObj);
+
             request('http://www.nfl.com/liveupdate/game-center/' + weekObj.eid + '/' + weekObj.eid + '_gtd.json', function (err, resp, body) {
                 if (!err) {
                     //console.log('Got:\t\t' + weekObj);
@@ -165,15 +166,12 @@ function getGameData(seasonArray, season, playersObj, getGameCallback) {
 
             getGameCallback();
         });
-
-
     });
 }
 
 function main() {
     if (process.argv.length !== 3) {
         return console.log('A season must be specified (2009 - 2015)');
-
     }
 
     async.waterfall([
