@@ -18,15 +18,16 @@ var pool = require('../../models/mysqldb.js');
 //Global variables
 var baseUrl = 'http://www.nfl.com',
     gsisProfileUrl = 'http://www.nfl.com/players/profile?id=',
-    rosterUrl = 'http://www.nfl.com/players/profile?id=';
+    rosterUrl = 'http://www.nfl.com/teams/roster?team=';
 
 function findByURL(array, url) {
-    for (var i = 0; i < array.length; i++) {
-        if (array[i].player_profile_url === url) {
-            return array[i];
+    var keyArray = Object.keys(array);
+
+    for (var i = 0; i < keyArray.length; i++) {
+        if (array[keyArray[i]].player_profile_url === url) {
+            return keyArray[i];
         }
     }
-
     return null;
 }
 
@@ -42,8 +43,6 @@ function loadPlayerJSON(callback) {
 }
 
 function getPlayerProfileIDs(players, callback) {
-
-
     async.eachLimit(Object.keys(players), 1, function (player, callback) {
         if (!(players[player].hasOwnProperty('player_profile_url'))) {
 
@@ -130,68 +129,98 @@ function getTeamAbbrs(players, callback) {
 }
 
 function checkTeamRosters(teams, players, callback) {
-
     async.eachLimit(teams, 1, function (team, callback) {
-
         console.log('Getting Team Roster (' + team.team_abbr + ')');
-
         request(rosterUrl + team.team_abbr, function (err, resp, body) {
             if (err) {
                 return console.log(err);
             }
 
             var $ = cheerio.load(body);
+            var rosterPlayers = $('#team-stats-wrapper').children('#result').children()
+                .last('tbody').children();
 
-            $('#team-stats-wrapper').children('#result').children()
-                .last('tbody').children().each(function () {
+            async.eachLimit(rosterPlayers, 1, function (rosterPlayer, callback) {
+                var playerURL = $(rosterPlayer).children().eq(1).children().attr('href'),
+                    playerName = $(rosterPlayer).children().eq(1).text().trim().split(', '),
+                    playerHeight = $(rosterPlayer).children().eq(4).text().trim().split('\''),
+                    uniformNum = $(rosterPlayer).children().eq(0).text().trim(),
+                    posInArray = null;
 
-                    var playerUrl = $(this).children().eq(1).children().attr('href'),
-                        splitUrl = playerUrl.split('/'),
-                        playerName = $(this).children().eq(1).text().trim().split(', '),
-                        playerHeight = $(this).children().eq(4).text().trim().split('\''),
-                        uniformNum = $(this).children().eq(0).text().trim();
+                playerHeight[1] = playerHeight[1].replace('"', '');
 
-                    var posInArray = null;
+                if (isNaN(parseInt(uniformNum, 10))) {
+                    uniformNum = 0;
+                } else {
+                    uniformNum = parseInt(uniformNum, 10);
+                }
 
-                    var playerArr = Object.keys(players);
 
-                    if (posInArray = (findByURL(playerArr, baseUrl + playerUrl)) !== null) {
-                        //Player was found in mapping
-                        console.log('Found Player');
-                        console.log(playerArr[posInArray]);
-                    } else {
-                        console.log('Player not found');
+                if ((posInArray = findByURL(players, baseUrl + playerURL)) === null ) {
+                    request(baseUrl + playerURL, function (err, resp, body) {
+                        var $ = cheerio.load(body);
+                        var gsis = $('*').html().match(/GSIS\s+ID:\s+([0-9-]+)/);
+                        console.log('Found New Player GSIS: ' + gsis[1]);
+
+                        players[gsis[1]] = {
+                            player_first_name: playerName[1],
+                            player_last_name: playerName[0],
+                            player_position: $(rosterPlayer).children().eq(2).text().trim(),
+                            player_dob: $(rosterPlayer).children().eq(6).text().trim(),
+                            player_weight_lb: parseInt($(rosterPlayer).children().eq(5).text().trim(), 10),
+                            player_height_cm: Math.round((parseInt(playerHeight[0], 10) * 30.48)
+                                + parseInt(playerHeight[1] * 2.54, 10)),
+                            player_college: $(rosterPlayer).children().eq(8).text().trim(),
+                            player_years_exp: parseInt($(rosterPlayer).children().eq(7).text().trim(), 10),
+                            player_uniform_num: uniformNum,
+                            player_status: $(rosterPlayer).children().eq(3).text().trim(),
+                            player_profile_url: baseUrl + playerURL
+                        };
+
+                        setTimeout(function () {
+                            callback();
+                        }, Math.floor(Math.random() * (5000 - 500 + 1)) + 500);
+
+                    });
+                } else {
+                    console.log('Found Player in Mapping, Updating Details:');
+                    //Player was found in mapping, update details
+                    players[posInArray] = {
+                        player_team_id: team.team_id,
+                        player_first_name: playerName[1],
+                        player_last_name: playerName[0],
+                        player_position: $(rosterPlayer).children().eq(2).text().trim(),
+                        player_dob: $(rosterPlayer).children().eq(6).text().trim(),
+                        player_weight_lb: parseInt($(rosterPlayer).children().eq(5).text().trim(), 10),
+                        player_height_cm: Math.round((parseInt(playerHeight[0], 10) * 30.48)
+                            + parseInt(playerHeight[1] * 2.54, 10)),
+                        player_college: $(rosterPlayer).children().eq(8).text().trim(),
+                        player_years_exp: parseInt($(rosterPlayer).children().eq(7).text().trim(), 10),
+                        player_uniform_num: uniformNum,
+                        player_status: $(rosterPlayer).children().eq(3).text().trim(),
+                        player_profile_url: baseUrl + playerURL
                     }
 
-                    playerHeight[1] = playerHeight[1].replace('"', '');
+                    console.log('Updated: ' + posInArray + ' (' +
+                        playerName[1] + ' ' + playerName[0] + ')');
 
+                    callback();
+                }
 
-                    if (isNaN(parseInt(uniformNum, 10))) {
-                        uniformNum = 0;
-                    } else {
-                        uniformNum = parseInt(uniformNum, 10);
+            }, function (err) {
+                if (err) {
+                    return console.log(err);
+                }
+
+                savePlayers(players, function (err, result) {
+                    if (err) {
+                        return console.log(err);
                     }
-
-                    //var playerObj = new Player({
-                    //    player_id: parseInt(splitUrl[3], 10),
-                    //    team_id: team.team_id,
-                    //    player_first_name: playerName[1],
-                    //    player_last_name: playerName[0],
-                    //    player_position: $(this).children().eq(2).text().trim(),
-                    //    player_dob: $(this).children().eq(6).text().trim(),
-                    //    player_weight_lb: parseInt($(this).children().eq(5).text().trim(), 10),
-                    //    player_height_cm: Math.round((parseInt(playerHeight[0], 10) * 30.48)
-                    //        + parseInt(playerHeight[1] * 2.54, 10)),
-                    //    player_college: $(this).children().eq(8).text().trim(),
-                    //    player_years_exp: parseInt($(this).children().eq(7).text().trim(), 10),
-                    //    player_uniform_num: uniformNum,
-                    //    player_status: $(this).children().eq(3).text().trim(),
-                    //    player_profile_url: baseURL + playerUrl
-                    //});
-
+                    console.log(result);
+                    callback();
                 });
 
-            callback();
+            });
         });
 
     }, function (err) {
@@ -203,12 +232,22 @@ function checkTeamRosters(teams, players, callback) {
     });
 }
 
+function savePlayers(players, callback) {
+    fs.writeFile('/home/vagrant/fyp/fyp-app/jsonData/players.json', JSON.stringify(players),
+        { flags: 'wx' }, function (err) {
+            if (err) {
+                return callback(err);
+            }
+
+            callback(null, 'Saved Players to File');
+        });
+}
+
 function main() {
 
     async.waterfall([
         loadPlayerJSON,
         getPlayerProfileIDs,
-        savePlayerJSON,
         getTeamAbbrs,
         checkTeamRosters
     ], function (err) {
