@@ -21,14 +21,26 @@ var baseUrl = 'http://www.nfl.com',
     rosterUrl = 'http://www.nfl.com/teams/roster?team=';
 
 function findByURL(array, url) {
-    var keyArray = Object.keys(array);
+    var keyArray = Object.keys(array),
+        i;
 
-    for (var i = 0; i < keyArray.length; i++) {
+    for (i = 0; i < keyArray.length; i++) {
         if (array[keyArray[i]].player_profile_url === url) {
             return keyArray[i];
         }
     }
     return null;
+}
+
+function savePlayers(players, callback) {
+    fs.writeFile('/home/vagrant/fyp/fyp-app/jsonData/players.json',
+        JSON.stringify(players), {flags: 'wx'}, function (err) {
+            if (err) {
+                return callback(err);
+            }
+
+            callback(null, 'Saved Players to File');
+        });
 }
 
 function loadPlayerJSON(callback) {
@@ -55,8 +67,9 @@ function getPlayerProfileIDs(players, callback) {
             }, function (err, resp) {
                 if (err) {
                     console.log('Error: Saving changes to players.json');
-                    fs.writeFile('/home/vagrant/fyp/fyp-app/jsonData/players.json', JSON.stringify(players),
-                        { flags: 'wx' }, function (err) {
+                    fs.writeFile('/home/vagrant/fyp/fyp-app/jsonData/players.json',
+                        JSON.stringify(players),
+                        {flags: 'wx'}, function (err) {
                             if (err) {
                                 return console.log(err);
                             }
@@ -68,21 +81,19 @@ function getPlayerProfileIDs(players, callback) {
                 players[player].player_profile_url = baseUrl
                     + resp.client._httpMessage.path;
 
-                console.log(players[player]);
+                console.log('Writing Changes to Disk');
 
-                console.log('Waiting');
+                savePlayers(players, function (err, result) {
+                    if (err) {
+                        return console.log(err);
+                    }
 
-                fs.writeFile('/home/vagrant/fyp/fyp-app/jsonData/players.json', JSON.stringify(players),
-                    { flags: 'wx' }, function (err) {
-                        if (err) {
-                            return console.log(err);
-                        }
+                    console.log(result);
 
-                        setTimeout(function () {
-                            callback();
-                        }, Math.floor(Math.random() * (5000 - 500 + 1)) + 500);
-
-                    });
+                    setTimeout(function () {
+                        callback();
+                    }, Math.floor(Math.random() * (5000 - 500 + 1)) + 500);
+                });
             });
         } else {
             callback();
@@ -99,17 +110,6 @@ function getPlayerProfileIDs(players, callback) {
 
 }
 
-function savePlayerJSON(players, callback) {
-    fs.writeFile('/home/vagrant/fyp/fyp-app/jsonData/players.json', JSON.stringify(players),
-        { flags: 'wx' }, function (err) {
-            if (err) {
-                return console.log(err);
-            }
-
-            callback(null, players);
-        });
-}
-
 function getTeamAbbrs(players, callback) {
     pool.getConnection(function (err, connection) {
         if (err) {
@@ -118,13 +118,13 @@ function getTeamAbbrs(players, callback) {
 
         connection.query('SELECT team_id, team_abbr FROM team' +
             ' WHERE team_abbr != "UNK"', function (err, teams) {
-                if (err) {
-                    return console.log(err);
-                }
+            if (err) {
+                return console.log(err);
+            }
 
-                connection.release();
-                callback(null, teams, players);
-            });
+            connection.release();
+            callback(null, teams, players);
+        });
     });
 }
 
@@ -136,16 +136,20 @@ function checkTeamRosters(teams, players, callback) {
                 return console.log(err);
             }
 
-            var $ = cheerio.load(body);
-            var rosterPlayers = $('#team-stats-wrapper').children('#result').children()
-                .last('tbody').children();
+            var $ = cheerio.load(body),
+                rosterPlayers = $('#team-stats-wrapper').children('#result')
+                    .children().last('tbody').children();
 
             async.eachLimit(rosterPlayers, 1, function (rosterPlayer, callback) {
-                var playerURL = $(rosterPlayer).children().eq(1).children().attr('href'),
-                    playerName = $(rosterPlayer).children().eq(1).text().trim().split(', '),
-                    playerHeight = $(rosterPlayer).children().eq(4).text().trim().split('\''),
-                    uniformNum = $(rosterPlayer).children().eq(0).text().trim(),
-                    posInArray = null;
+                var playerURL = $(rosterPlayer).children().eq(1)
+                    .children().attr('href'),
+                    playerName = $(rosterPlayer).children().eq(1)
+                        .text().trim().split(', '),
+                    playerHeight = $(rosterPlayer).children().eq(4)
+                        .text().trim().split('\''),
+                    uniformNum = $(rosterPlayer).children().eq(0)
+                        .text().trim(),
+                    posInArray;
 
                 playerHeight[1] = playerHeight[1].replace('"', '');
 
@@ -156,10 +160,14 @@ function checkTeamRosters(teams, players, callback) {
                 }
 
 
-                if ((posInArray = findByURL(players, baseUrl + playerURL)) === null ) {
+                if ((posInArray = findByURL(players, baseUrl + playerURL)) === null) {
                     request(baseUrl + playerURL, function (err, resp, body) {
-                        var $ = cheerio.load(body);
-                        var gsis = $('*').html().match(/GSIS\s+ID:\s+([0-9-]+)/);
+                        if (err) {
+                            return console.log(err);
+                        }
+
+                        var $ = cheerio.load(body),
+                            gsis = $('*').html().match(/GSIS\s+ID:\s+([0-9-]+)/);
                         console.log('Found New Player GSIS: ' + gsis[1]);
 
                         players[gsis[1]] = {
@@ -189,17 +197,21 @@ function checkTeamRosters(teams, players, callback) {
                         player_team_id: team.team_id,
                         player_first_name: playerName[1],
                         player_last_name: playerName[0],
-                        player_position: $(rosterPlayer).children().eq(2).text().trim(),
+                        player_position: $(rosterPlayer).children()
+                            .eq(2).text().trim(),
                         player_dob: $(rosterPlayer).children().eq(6).text().trim(),
-                        player_weight_lb: parseInt($(rosterPlayer).children().eq(5).text().trim(), 10),
+                        player_weight_lb: parseInt($(rosterPlayer).children()
+                            .eq(5).text().trim(), 10),
                         player_height_cm: Math.round((parseInt(playerHeight[0], 10) * 30.48)
                             + parseInt(playerHeight[1] * 2.54, 10)),
                         player_college: $(rosterPlayer).children().eq(8).text().trim(),
-                        player_years_exp: parseInt($(rosterPlayer).children().eq(7).text().trim(), 10),
+                        player_years_exp: parseInt($(rosterPlayer).children()
+                            .eq(7).text().trim(), 10),
                         player_uniform_num: uniformNum,
-                        player_status: $(rosterPlayer).children().eq(3).text().trim(),
+                        player_status: $(rosterPlayer).children().eq(3)
+                            .text().trim(),
                         player_profile_url: baseUrl + playerURL
-                    }
+                    };
 
                     console.log('Updated: ' + posInArray + ' (' +
                         playerName[1] + ' ' + playerName[0] + ')');
@@ -232,19 +244,7 @@ function checkTeamRosters(teams, players, callback) {
     });
 }
 
-function savePlayers(players, callback) {
-    fs.writeFile('/home/vagrant/fyp/fyp-app/jsonData/players.json', JSON.stringify(players),
-        { flags: 'wx' }, function (err) {
-            if (err) {
-                return callback(err);
-            }
-
-            callback(null, 'Saved Players to File');
-        });
-}
-
 function main() {
-
     async.waterfall([
         loadPlayerJSON,
         getPlayerProfileIDs,
