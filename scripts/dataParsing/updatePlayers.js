@@ -55,7 +55,7 @@ function loadPlayerJSON(callback) {
 }
 
 function getPlayerProfileIDs(players, callback) {
-    async.eachLimit(Object.keys(players), 1, function (player, callback) {
+    async.each(Object.keys(players), function (player, callback) {
         if (!(players[player].hasOwnProperty('player_profile_url'))) {
 
             console.log('Requesting: (' + player + ')');
@@ -67,15 +67,6 @@ function getPlayerProfileIDs(players, callback) {
             }, function (err, resp) {
                 if (err) {
                     console.log('Error: Saving changes to players.json');
-                    fs.writeFile('/home/vagrant/fyp/fyp-app/jsonData/players.json',
-                        JSON.stringify(players),
-                        {flags: 'wx'}, function (err) {
-                            if (err) {
-                                return console.log(err);
-                            }
-
-                            return console.log(err);
-                        });
                 }
 
                 players[player].player_profile_url = baseUrl
@@ -96,10 +87,10 @@ function getPlayerProfileIDs(players, callback) {
                 });
             });
         } else {
-            callback();
+            process.nextTick(function () {
+                callback();
+            });
         }
-
-
     }, function (err) {
         if (err) {
             return console.log(err);
@@ -118,13 +109,13 @@ function getTeamAbbrs(players, callback) {
 
         connection.query('SELECT team_id, team_abbr FROM team' +
             ' WHERE team_abbr != "UNK"', function (err, teams) {
-            if (err) {
-                return console.log(err);
-            }
+                if (err) {
+                    return console.log(err);
+                }
 
-            connection.release();
-            callback(null, teams, players);
-        });
+                connection.release();
+                callback(null, teams, players);
+            });
     });
 }
 
@@ -168,22 +159,25 @@ function checkTeamRosters(teams, players, callback) {
 
                         var $ = cheerio.load(body),
                             gsis = $('*').html().match(/GSIS\s+ID:\s+([0-9-]+)/);
-                        console.log('Found New Player GSIS: ' + gsis[1]);
 
-                        players[gsis[1]] = {
-                            player_first_name: playerName[1],
-                            player_last_name: playerName[0],
-                            player_position: $(rosterPlayer).children().eq(2).text().trim(),
-                            player_dob: $(rosterPlayer).children().eq(6).text().trim(),
-                            player_weight_lb: parseInt($(rosterPlayer).children().eq(5).text().trim(), 10),
-                            player_height_cm: Math.round((parseInt(playerHeight[0], 10) * 30.48)
-                                + parseInt(playerHeight[1] * 2.54, 10)),
-                            player_college: $(rosterPlayer).children().eq(8).text().trim(),
-                            player_years_exp: parseInt($(rosterPlayer).children().eq(7).text().trim(), 10),
-                            player_uniform_num: uniformNum,
-                            player_status: $(rosterPlayer).children().eq(3).text().trim(),
-                            player_profile_url: baseUrl + playerURL
-                        };
+                        if (gsis[1].length > 4) {
+                            console.log('Found New Player GSIS: ' + gsis[1]);
+
+                            players[gsis[1]] = {
+                                player_first_name: playerName[1],
+                                player_last_name: playerName[0],
+                                player_position: $(rosterPlayer).children().eq(2).text().trim(),
+                                player_dob: $(rosterPlayer).children().eq(6).text().trim(),
+                                player_weight_lb: parseInt($(rosterPlayer).children().eq(5).text().trim(), 10),
+                                player_height_cm: Math.round((parseInt(playerHeight[0], 10) * 30.48)
+                                    + parseInt(playerHeight[1] * 2.54, 10)),
+                                player_college: $(rosterPlayer).children().eq(8).text().trim(),
+                                player_years_exp: parseInt($(rosterPlayer).children().eq(7).text().trim(), 10),
+                                player_uniform_num: uniformNum,
+                                player_status: $(rosterPlayer).children().eq(3).text().trim(),
+                                player_profile_url: baseUrl + playerURL
+                            };
+                        }
 
                         setTimeout(function () {
                             callback();
@@ -244,12 +238,29 @@ function checkTeamRosters(teams, players, callback) {
     });
 }
 
+function insertPlayersIntoDB(players, callback) {
+    pool.getConnection(function (err, connection) {
+        if (err) {
+            return console.log(err);
+        }
+
+        async.each(players, function (player, callback) {
+            console.log(player);
+            callback();
+        });
+
+        //connection.query('INSERT INTO player SET ?',
+        //    [])
+    });
+}
+
 function main() {
     async.waterfall([
         loadPlayerJSON,
         getPlayerProfileIDs,
         getTeamAbbrs,
-        checkTeamRosters
+        checkTeamRosters,
+        insertPlayersIntoDB
     ], function (err) {
         if (err) {
             return console.log(err);
