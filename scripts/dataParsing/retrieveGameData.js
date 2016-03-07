@@ -126,19 +126,6 @@ function getGameData(seasonArray, season, playersObj, getGameCallback) {
                         }, 1000);
                     });
 
-                    //mkdirp('/home/vagrant/fyp/fyp-app/jsonData/games/' + season + '/week_' + obj.week, function (err) {
-                    //    if (err) {
-                    //        return console.log('mkdirp: ' + err);
-                    //    } else {
-                    //        fs.writeFile('/home/vagrant/fyp/fyp-app/jsonData/games/' + season + '/week_' + obj.week + '/' + Object.keys(jsonObj)[0], body, { flags: 'wx' }, function (err) {
-                    //            if (err) {
-                    //                return console.log('Error: ' + err);
-                    //            }
-                    //
-                    //            //console.log('Saved:\t\t' + weekObj);
-                    //        });
-                    //    }
-                    //});
                 }
 
 

@@ -130,6 +130,8 @@ function insertPlayers(playerArr, callback) {
         }
 
         async.each(playerArr, function (player, callback) {
+
+
             player.insert(connection, function (err, result) {
                 if (err) {
                     return console.log(err);

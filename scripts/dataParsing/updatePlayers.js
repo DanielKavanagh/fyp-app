@@ -113,6 +113,10 @@ function getTeamAbbrs(players, callback) {
                     return console.log(err);
                 }
 
+                if (teams.length === 0) {
+                    return callback('No Teams Found (Check Database)');
+                }
+
                 connection.release();
                 callback(null, teams, players);
             });
@@ -120,6 +124,11 @@ function getTeamAbbrs(players, callback) {
 }
 
 function checkTeamRosters(teams, players, callback) {
+    if (process.argv.indexOf('--no-update') !== -1) {
+        console.log('Skipping Player Roster Update');
+        return callback(null, players);
+    }
+
     async.eachLimit(teams, 1, function (team, callback) {
         console.log('Getting Team Roster (' + team.team_abbr + ')');
         request(rosterUrl + team.team_abbr, function (err, resp, body) {
@@ -135,11 +144,11 @@ function checkTeamRosters(teams, players, callback) {
                 var playerURL = $(rosterPlayer).children().eq(1)
                     .children().attr('href'),
                     playerName = $(rosterPlayer).children().eq(1)
-                        .text().trim().split(', '),
+                    .text().trim().split(', '),
                     playerHeight = $(rosterPlayer).children().eq(4)
-                        .text().trim().split('\''),
+                    .text().trim().split('\''),
                     uniformNum = $(rosterPlayer).children().eq(0)
-                        .text().trim(),
+                    .text().trim(),
                     posInArray;
 
                 playerHeight[1] = playerHeight[1].replace('"', '');
@@ -234,23 +243,63 @@ function checkTeamRosters(teams, players, callback) {
             return console.log(err);
         }
 
-        callback(null);
+        callback(null, players);
+    });
+}
+
+function getNonRosterPlayers(players, callback) {
+    console.log('Getting Players not on a Roster');
+
+    async.each(players, function (player, callback) {
+        //console.log(player.player_team_id);
+        if (player.hasOwnProperty('player_team_id') === false) {
+            request(player.player_profile_url, function (err, resp, body) {
+                if (err) {
+                    return console.log(err);
+                }
+
+                var $ = cheerio.load(body);
+
+
+            });
+        }
+
+        callback();
+
+    }, function (err) {
+        if (err) {
+            return console.log(err);
+        }
     });
 }
 
 function insertPlayersIntoDB(players, callback) {
+    console.log('Saving Players to DB');
     pool.getConnection(function (err, connection) {
         if (err) {
             return console.log(err);
         }
 
-        async.each(players, function (player, callback) {
-            console.log(player);
+        //console.log(players);
+        async.each(Object.keys(players), function (player, callback) {
+
+            //console.log(player);
+            players[player].player_gsis = player;
+            //console.log(players[player]);
+            //connection.query('INSERT INTO player SET ?', [player],
+            //    function (err, result) {
+            //
+            //});
             callback();
+        }, function (err) {
+            if (err) {
+                return console.log(err);
+            }
+
+            callback(null);
         });
 
-        //connection.query('INSERT INTO player SET ?',
-        //    [])
+
     });
 }
 
@@ -260,11 +309,14 @@ function main() {
         getPlayerProfileIDs,
         getTeamAbbrs,
         checkTeamRosters,
+        getNonRosterPlayers,
         insertPlayersIntoDB
     ], function (err) {
         if (err) {
             return console.log(err);
         }
+
+        process.exit(0);
     });
 }
 
