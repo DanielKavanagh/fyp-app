@@ -189,6 +189,7 @@ function checkTeamRosters(teams, players, callback) {
                         }
 
                         setTimeout(function () {
+                            $ = null;
                             callback();
                         }, Math.floor(Math.random() * (5000 - 500 + 1)) + 500);
 
@@ -248,28 +249,126 @@ function checkTeamRosters(teams, players, callback) {
 }
 
 function getNonRosterPlayers(players, callback) {
+    var playerCounter = 0;
     console.log('Getting Players not on a Roster');
 
-    async.each(players, function (player, callback) {
+    async.eachLimit(players, 1, function (player, callback) {
         //console.log(player.player_team_id);
-        if (player.hasOwnProperty('player_team_id') === false) {
+        if (player.hasOwnProperty('team_id') === false) {
+            console.log('Requesting Player: ' + player.gsis_name);
+
             request(player.player_profile_url, function (err, resp, body) {
                 if (err) {
                     return console.log(err);
                 }
 
-                var $ = cheerio.load(body);
+                var $ = cheerio.load(body),
+                    playerName = '',
+                    dobString = '',
+                    physicalString = '',
+                    heightString = '',
+                    playerExperience = 0,
+                    playerCollege = '',
+                    playerNumber = 0;
+
+                if ($('.player-info > .player-team-links').length === 0) {
+                    //Player is retired
+
+                    playerName = $('.player-name').text().trim().split(' ');
+                    dobString = $('.player-info').children('p').eq(2).text().trim().split(' ');
+                    physicalString = $('.player-info').children('p').eq(1).text().trim().split(' ');
+                    heightString = physicalString[1].trim().split('-');
+                    playerExperience = $('.player-info').children('p').eq(4).text().trim().split(' ');
+                    playerCollege =  $('.player-info').children('p').eq(3).text().trim().split(': ');
+
+                    player.team_id = 33;
+                    player.player_first_name = playerName[0];
+                    player.player_last_name = playerName[1];
+                    player.player_position = '';
+                    player.player_uniform_num = 0;
+                    player.player_dob = dobString[1];
+                    player.player_weight_lb = parseInt(physicalString[4], 10);
+                    player.player_height_cm = Math.round((parseInt(heightString[0], 10) * 30.48) +
+                        parseInt(heightString[1] * 2.54, 10));
+                    player.player_college = playerCollege[1];
+
+                    if (playerExperience[1] === 'Rookie') {
+                        player.player_years_exp = 0;
+                    } else {
+                        player.player_years_exp = parseInt(playerExperience[1], 10);
+                    }
+
+                    player.player_status = 'RET';
+
+                } else {
+                    //Player is Free Agent
+                    playerName = $('.player-name').text().trim().split(' ');
+                    playerNumber = $('.player-number').text().trim().split(' ');
+                    dobString = $('.player-info').children('p').eq(3).text().trim().split(' ');
+                    physicalString = $('.player-info').children('p').eq(2).text().trim().split(' ');
+                    heightString = physicalString[1].trim().split('-');
+                    playerCollege = $('.player-info').children('p').eq(4).text().trim().split(': ');
+                    playerExperience = $('.player-info').children('p').eq(5).text().trim().split(' ');
+
+                    player.team_id = 33;
+                    player.player_first_name = playerName[0];
+                    player.player_last_name = playerName[1];
+                    player.player_position = playerNumber[1];
+                    player.player_dob = dobString[1];
+                    player.player_uniform_num = 0;
+                    player.player_weight_lb = parseInt(physicalString[4], 10);
+                    player.player_height_cm = Math.round((parseInt(heightString[0], 10) * 30.48)
+                        + parseInt(heightString[1] * 2.54, 10));
+                    player.player_college = playerCollege[1];
+
+                    if (playerExperience[1] === 'Rookie') {
+                        player.player_years_exp = 0;
+                    } else {
+                        player.player_years_exp = parseInt(playerExperience[1], 10);
+                    }
+
+                    player.player_status = 'FA';
+                }
+
+                console.log(player);
+
+                if ((playerCounter % 10) === 0) {
+                    savePlayers(players, function (err, result) {
+                        if (err) {
+                            return console.log(err);
+                        }
+
+                        console.log(result);
+                    });
+                }
+
+                console.log('Waiting');
+                playerCounter++;
+                setTimeout(function () {
+                    $ = null;
+                    callback();
+                }, Math.floor(Math.random() * (5000 - 500 + 1)) + 500);
 
 
             });
+        } else {
+            callback();
         }
-
-        callback();
-
     }, function (err) {
         if (err) {
             return console.log(err);
         }
+
+        savePlayers(players, function (err, result) {
+            if (err) {
+                return console.log(err);
+            }
+
+            console.log(result);
+            callback(null, players);
+        });
+
+
     });
 }
 
@@ -285,12 +384,28 @@ function insertPlayersIntoDB(players, callback) {
 
             //console.log(player);
             players[player].player_gsis = player;
-            //console.log(players[player]);
-            //connection.query('INSERT INTO player SET ?', [player],
-            //    function (err, result) {
-            //
-            //});
-            callback();
+            console.log(players[player]);
+            connection.query('INSERT INTO player SET ?', [
+                players[player].team_id,
+                players[player].player_first_name,
+                players[player].player_last_name,
+                players[player].player_position,
+                players[player].player_dob,
+                players[player].player_weight_lb,
+                players[player].player_height_cm,
+                players[player].player_college,
+                players[player].player_years_exp,
+                players[player].player_uniform_num,
+                players[player].player_status,
+                players[player].player_profile_url,
+                players[player].player_gsis
+            ], function (err, result) {
+                if (err) {
+                    console.log(err);
+                }
+
+                callback();
+            });
         }, function (err) {
             if (err) {
                 return console.log(err);

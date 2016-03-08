@@ -97,48 +97,42 @@ function getGameData(seasonArray, season, playersObj, getGameCallback) {
                     var jsonObj = JSON.parse(body),
                         gameRef = jsonObj[Object.keys(jsonObj)[0]];
 
-                    for (var stat in gameRef.home.stats) {
-                        if (stat !== 'team') {
-                            var statObj = gameRef.home.stats[stat];
-
-                            for (var prop in statObj) {
-                                if (!(prop in playersObj)) {
-                                    playersObj[prop] = {
-                                        name: statObj[prop].name
-                                    };
-                                }
-                            }
-                        }
-                    }
+                    //for (var stat in gameRef.home.stats) {
+                    //    if (stat !== 'team') {
+                    //        var statObj = gameRef.home.stats[stat];
+                    //
+                    //        for (var prop in statObj) {
+                    //            if (!(prop in playersObj)) {
+                    //                playersObj[prop] = {
+                    //                    name: statObj[prop].name
+                    //                };
+                    //            }
+                    //        }
+                    //    }
+                    //}
 
                     gameRef.season = season;
                     gameRef.week = obj.week;
                     gameRef.time = weekObj.time;
                     gameRef.gameType = weekObj.type;
 
-                    fs.writeFile('/home/vagrant/fyp/fyp-app/jsonData/gameJSON/' + weekObj.eid, { flags: 'wx' }, function (err) {
+                    fs.writeFile('/home/vagrant/fyp/fyp-app/jsonData/gameJSON/' + weekObj.eid, JSON.stringify(jsonObj), { flags: 'wx' }, function (err) {
                         if (err) {
                             return console.log(err);
                         }
 
                         setTimeout(function () {
                             innerCallback();
-                        }, 1000);
+                        }, 1500);
                     });
-
                 }
-
-
             });
-
         }, function (err) {
-
             if (err) {
                 console.log(err);
             } else {
                 outerCallback();
             }
-
         });
 
     }, function (err) {
@@ -146,13 +140,15 @@ function getGameData(seasonArray, season, playersObj, getGameCallback) {
             console.log(err);
         }
 
-        fs.writeFile('/home/vagrant/fyp/fyp-app/jsonData/players.json', JSON.stringify(playersObj), { flags: 'wx' }, function (err) {
-            if (err) {
-                return console.log(err);
-            }
+        getGameCallback();
 
-            getGameCallback();
-        });
+        //fs.writeFile('/home/vagrant/fyp/fyp-app/jsonData/players.json', JSON.stringify(playersObj), { flags: 'wx' }, function (err) {
+        //    if (err) {
+        //        return console.log(err);
+        //    }
+        //
+        //    getGameCallback();
+        //});
     });
 }
 
