@@ -352,7 +352,9 @@ function getNonRosterPlayers(players, callback) {
 
             });
         } else {
-            callback();
+            process.nextTick(function () {
+                callback();
+            });
         }
     }, function (err) {
         if (err) {
@@ -381,25 +383,23 @@ function insertPlayersIntoDB(players, callback) {
 
         //console.log(players);
         async.each(Object.keys(players), function (player, callback) {
-
             //console.log(player);
             players[player].player_gsis = player;
-            console.log(players[player]);
-            connection.query('INSERT INTO player SET ?', [
-                players[player].team_id,
-                players[player].player_first_name,
-                players[player].player_last_name,
-                players[player].player_position,
-                players[player].player_dob,
-                players[player].player_weight_lb,
-                players[player].player_height_cm,
-                players[player].player_college,
-                players[player].player_years_exp,
-                players[player].player_uniform_num,
-                players[player].player_status,
-                players[player].player_profile_url,
-                players[player].player_gsis
-            ], function (err, result) {
+            connection.query('INSERT INTO player SET ?', {
+                team_id: players[player].team_id,
+                player_gsis: players[player].player_gsis,
+                player_first_name: players[player].player_first_name,
+                player_last_name: players[player].player_last_name,
+                player_position: players[player].player_position,
+                player_dob: players[player].player_dob,
+                player_weight_lb: players[player].player_weight_lb,
+                player_height_cm: players[player].player_height_cm,
+                player_college: players[player].player_college,
+                player_years_exp: players[player].player_years_exp,
+                player_uniform_num: players[player].player_uniform_num,
+                player_status: players[player].player_status,
+                player_profile_url: players[player].player_profile_url
+            }, function (err, result) {
                 if (err) {
                     console.log(err);
                 }
