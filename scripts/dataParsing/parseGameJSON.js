@@ -153,24 +153,21 @@ function insertGame(game, connection, callback) {
                 away_total_punt_avg: gameRef.away.stats.team.ptavg
             });
 
-            callback(null, game, 1, connection);
-            //gameObj.insert(connection, function (err, result) {
-            //    if (err) {
-            //        return console.log(err);
-            //    }
-            //
-            //    //Release the connection back to the pool
-            //    connection.release();
-            //
-            //    callback(null, game, result.insertId);
-            //});
+            //callback(null, game, 1, connection);
+            gameObj.insert(connection, function (err, result) {
+                if (err) {
+                    return console.log(err);
+                }
+
+                callback(null, game, result.insertId, connection);
+            });
         });
 
 }
 
 function insertGameDrives(game, gameId, connection, callback) {
     console.log('Inserting Drives for Game');
-    var gameRef = game[Object.keys(game)[0]], driveId = 0, gamePlays = [];
+    var gameRef = game[Object.keys(game)[0]], driveId = 1, gamePlays = [];
     //Extract drives from game JSON
     var driveArr = Object.keys(gameRef.drives).map(function (k) {
         return gameRef.drives[k];
@@ -217,77 +214,99 @@ function insertGameDrives(game, gameId, connection, callback) {
 
                 gamePlays.push.apply(gamePlays, playArr);
 
-                callback();
+                //callback();
 
-                //driveObj.insert(connection, function (err, result) {
-                //    if (err) {
-                //        return console.log(err);
-                //    }
-                //
-                //    var playArr = Object.keys(drive.plays).map(function (k) {
-                //        return drive.plays[k];
-                //    });
-                //
-                //    playArr.forEach(function (play) {
-                //        play.driveID = driveObj.getAttribute('drive_id');
-                //        play.posteamID = driveObj.getAttribute('team_id');
-                //    });
-                //
-                //    gamePlays.push.apply(gamePlays, playArr);
-                //
-                //    callback();
-                //});
+                driveObj.insert(connection, function (err, result) {
+                    if (err) {
+                        return console.log(err);
+                    }
+
+                    var playArr = Object.keys(drive.plays).map(function (k) {
+                        return drive.plays[k];
+                    });
+
+                    playArr.forEach(function (play) {
+                        play.driveID = driveObj.getAttribute('drive_id');
+                        play.posteamID = driveObj.getAttribute('team_id');
+                    });
+
+                    gamePlays.push.apply(gamePlays, playArr);
+
+                    callback();
+                });
             });
     }, function (err) {
         if (err) {
             return console.log(err);
         }
 
-        callback(null, gameId, gamePlays);
+        callback(null, gameId, gamePlays, connection);
     });
 }
 
-function insertGamePlays(gameId, playArr, callback) {
+function insertGamePlays(gameId, playArr, connection, callback) {
     console.log('Inserting Plays for Game');
     var playId = 1;
 
     async.eachLimit(playArr, 1, function (play, callback) {
-        //console.log(play);
-        //callback();
-        var playObj = new Play({
-            game_id: gameId,
-            drive_id: play.driveID,
-            play_id: playId,
-            team_id: play.posteamID,
-            quarter: play.qtr,
-            down: play.down,
-            start_time: play.time,
-            yard_line: play.yrdln,
-            yards_to_first_down: play.ydstogo,
-            yards_this_drive: play.ydsnet,
-            play_description: play.desc,
-            play_note: play.note
-        });
+        var currDrive = play.driveID;
 
-        if ('0' in play.players) {
-            play.players['0'].forEach(function (sequence) {
+         
+        async.waterfall([
+            function (callback) {
+                var playObj = new Play({
+                    game_id: gameId,
+                    drive_id: play.driveID,
+                    play_id: playId,
+                    team_id: play.posteamID,
+                    quarter: play.qtr,
+                    down: play.down,
+                    start_time: play.time,
+                    yard_line: play.yrdln,
+                    yards_to_first_down: play.ydstogo,
+                    yards_this_drive: play.ydsnet,
+                    play_description: play.desc,
+                    play_note: play.note
+                });
 
-                //Retrieve statId information from map
-                var stat = StatMap.get(sequence.statId);
+                var playPlayers = Object.keys(play.players);
 
-                if (stat !== 'undefined') {
-                    stat.fields.forEach(function (field) {
-                        playObj.setAttribute(field, 1);
+                if (playPlayers.length === 0) {
+
+                } else {
+                    playPlayers.forEach(function (gsis) {
+                        play.players[gsis].forEach(function (playerAction) {
+                            var stat = StatMap.get(playerAction.statId);
+
+                            if (stat !== 'undefined') {
+                                stat.fields.forEach(function (field) {
+                                    playObj.setAttribute(field, 1);
+                                });
+                            }
+
+                        });
                     });
                 }
 
-                console.log(playObj);
-            });
-        }
+                playObj.insert(connection, function (err, result) {
+                    if (err) {
+                        return callback(err);
+                    }
 
-        //console.log(playObj);
+                    console.log(result);
 
-        callback();
+                    playId++;
+
+                    callback();
+                });
+            }
+        ], function (err) {
+            if (err) {
+                return console.log(err);
+            }
+
+            callback();
+        });
     }, function (err) {
         if (err) {
             return console.log(err);
