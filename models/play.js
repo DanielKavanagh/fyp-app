@@ -19,7 +19,7 @@ Play.prototype.setAttribute = function (attribute, value) {
 };
 
 Play.prototype.insert = function (connection, callback) {
-    connection.query('INSERT INTO play SET ?', {
+    connection.query('INSERT IGNORE INTO play SET ?', {
         game_id: this.play.game_id,
         drive_id: this.play.drive_id,
         play_id: this.play.play_id,

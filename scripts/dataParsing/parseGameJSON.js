@@ -11,6 +11,8 @@ var pool = require('../../models/mysqldb.js');
 var Game = require('../../models/game.js');
 var Drive = require('../../models/drive.js');
 var Play = require('../../models/play.js');
+var AggPlay = require('../../models/aggPlay.js');
+var PlayerPlay = require('../../models/playerPlay.js');
 var StatMap = require('../../models/statMap.js');
 
 //function readWeekDirectory(directory, callback) {
@@ -166,6 +168,7 @@ function insertGame(game, connection, callback) {
 }
 
 function insertGameDrives(game, gameId, connection, callback) {
+
     console.log('Inserting Drives for Game');
     var gameRef = game[Object.keys(game)[0]], driveId = 1, gamePlays = [];
     //Extract drives from game JSON
@@ -212,10 +215,6 @@ function insertGameDrives(game, gameId, connection, callback) {
                     play.posteamID = driveObj.getAttribute('team_id');
                 });
 
-                gamePlays.push.apply(gamePlays, playArr);
-
-                //callback();
-
                 driveObj.insert(connection, function (err, result) {
                     if (err) {
                         return console.log(err);
@@ -246,12 +245,16 @@ function insertGameDrives(game, gameId, connection, callback) {
 
 function insertGamePlays(gameId, playArr, connection, callback) {
     console.log('Inserting Plays for Game');
-    var playId = 1;
+    var playId = 1,
+        lastDrive = null;
+
+    console.log('Play Count: ' + playArr.length);
 
     async.eachLimit(playArr, 1, function (play, callback) {
-        var currDrive = play.driveID;
+        if (lastDrive !== play.driveID) {
+            playId = 1;
+        }
 
-         
         async.waterfall([
             function (callback) {
                 var playObj = new Play({
@@ -279,9 +282,11 @@ function insertGamePlays(gameId, playArr, connection, callback) {
                             var stat = StatMap.get(playerAction.statId);
 
                             if (stat !== 'undefined') {
-                                stat.fields.forEach(function (field) {
-                                    playObj.setAttribute(field, 1);
-                                });
+                                if (stat.fields.length !== 0) {
+                                    stat.fields.forEach(function (field) {
+                                        playObj.setAttribute(field, 1);
+                                    });
+                                }
                             }
 
                         });
@@ -293,12 +298,64 @@ function insertGamePlays(gameId, playArr, connection, callback) {
                         return callback(err);
                     }
 
-                    console.log(result);
+                    console.log('Inserted Play')
 
                     playId++;
-
-                    callback();
+                    lastDrive = play.driveID;
+                    callback(null, play, playObj.getAttribute('play_id'));
                 });
+            },
+            function (play, playId, callback) {
+
+                var aggPlayObj = new AggPlay({
+                    game_id: gameId,
+                    drive_id: play.driveID,
+                    play_id: playId
+                });
+
+                var playPlayers = Object.keys(play.players);
+
+                playPlayers.forEach(function (gsis) {
+                    play.players[gsis].forEach(function (playerAction) {
+                        var stat = StatMap.get(playerAction.statId);
+                        if (stat !== 'undefined') {
+                            stat.fields.forEach(function (field) {
+                                if (aggPlayObj.columnExistsInTable(field) === true) {
+                                    aggPlayObj.setAttribute(field, 1);
+                                }
+                            });
+
+                            if (stat.yards !== '') {
+                                if (aggPlayObj.columnExistsInTable(stat.yards) === true) {
+                                    aggPlayObj.setAttribute(stat.yards, playerAction.yards);
+                                }
+                            }
+                        }
+                    });
+                });
+
+                aggPlayObj.insert(connection, function (err, result) {
+                    if (err) {
+                        return callback(err);
+                    }
+
+                    console.log('Inserted Agg Play');
+
+                    callback(null, play, playId);
+                });
+            },
+            function (play, playId, callback) {
+                console.log('Inserting Player Play');
+                var playPlayers = Object.keys(play.players);
+                console.log(playPlayers);
+                playPlayers.forEach(function (gsis) {
+                //    console.log(gsis);
+                    play.players[gsis].forEach(function (playerAction) {
+
+                    });
+                });
+
+                callback(null);
             }
         ], function (err) {
             if (err) {

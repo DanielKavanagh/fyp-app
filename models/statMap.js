@@ -736,6 +736,21 @@ statMap.set(402, {
     description: 'Yards lost after a tackle for a loss'
 });
 
+statMap.set(403, {
+    category: 'defence',
+    fields: ['kicking_fg_blk_rec'],
+    yards: '',
+    description: 'Player recovered a blocked field goal or extra point attempt'
+});
+
+statMap.set(404, {
+    category: 'defence',
+    fields: ['kicking_fg_blk_tds'],
+    yards: '',
+    description: 'Defensive player scored at touchdown after a blocked ' +
+        'field goal or extra point'
+});
+
 statMap.set(410, {
     category: 'kicking',
     fields: [],

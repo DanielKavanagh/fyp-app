@@ -20,7 +20,7 @@ Game.prototype.setAttribute = function (attribute, value) {
 };
 
 Game.prototype.insert = function (connection, callback) {
-    connection.query('INSERT INTO game SET ?', [this.game],
+    connection.query('INSERT IGNORE INTO game SET ?', [this.game],
         function (err, result) {
             if (err) {
                 return callback(err);

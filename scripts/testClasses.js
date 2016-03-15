@@ -3,6 +3,9 @@
  */
 
 var Player = require('../models/player.js');
+var AggPlay = require('../models/aggPlay.js');
 var StatMap = require('../models/statMap.js');
 
-console.log(StatMap.get(2).description);
+var aggPlay = new AggPlay(null);
+
+console.log(aggPlay.columnExistsInTable('test'));
