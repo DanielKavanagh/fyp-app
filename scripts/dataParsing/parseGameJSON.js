@@ -347,15 +347,66 @@ function insertGamePlays(gameId, playArr, connection, callback) {
             function (play, playId, callback) {
                 console.log('Inserting Player Play');
                 var playPlayers = Object.keys(play.players);
-                console.log(playPlayers);
+                console.log(play);
+
+                if (playPlayers.length === 0) {
+                    callback(null);
+                }
+
                 playPlayers.forEach(function (gsis) {
-                //    console.log(gsis);
-                    play.players[gsis].forEach(function (playerAction) {
+                    if (gsis !== '0') {
+                        connection.query('SELECT player_id FROM player WHERE player_gsis = ?',
+                            [gsis], function (err, result) {
+                                if (err) {
+                                    return console.log(err);
+                                }
 
-                    });
+                                console.log(result);
+
+                                if (result.length !== 1) {
+                                    return console.log('More than one player found, check data consistency');
+                                }
+
+                                var playerPlayObj = new PlayerPlay({
+                                    game_id: gameId,
+                                    drive_id: play.driveID,
+                                    play_id: playId,
+                                    player_id: result[0].player_id,
+                                    team_id: play.posteamID
+                                });
+
+                                play.players[gsis].forEach(function (playerAction) {
+                                    var stat = StatMap.get(playerAction.statId);
+
+                                    if (stat !== 'undefined') {
+                                        stat.fields.forEach(function (field) {
+                                            if (playerPlayObj.columnExistsInTable(field) === true) {
+                                                playerPlayObj.setAttribute(field, (playerPlayObj.getAttribute(field) || 0) + 1);
+                                            }
+                                        });
+
+                                        if (stat.yards !== '') {
+                                            if (playerPlayObj.columnExistsInTable(stat.yards) === true) {
+                                                playerPlayObj.setAttribute(stat.yards, (playerPlayObj
+                                                    .getAttribute(playerAction.yards) || 0) + playerAction.yards);
+                                            }
+                                        }
+                                    }
+                                });
+
+                                playerPlayObj.insert(connection, function (err, result) {
+                                    if (err) {
+                                        return callback(err);
+                                    }
+
+                                    console.log('Inserted Player Play');
+                                    callback(null);
+                                });
+                            });
+                    } else {
+                        callback(null);
+                    }
                 });
-
-                callback(null);
             }
         ], function (err) {
             if (err) {

@@ -89,27 +89,74 @@ function readPlayerJson(seasonArray, season, callback) {
 function getGameData(seasonArray, season, playersObj, getGameCallback) {
     async.each(seasonArray, function (obj, outerCallback) {
         async.eachLimit(obj.games, 1, function (weekObj, innerCallback) {
-            console.log('Getting:\t' + weekObj);
+            console.log('Getting:\t' + weekObj.eid);
 
             request('http://www.nfl.com/liveupdate/game-center/' + weekObj.eid + '/' + weekObj.eid + '_gtd.json', function (err, resp, body) {
                 if (!err) {
-                    //console.log('Got:\t\t' + weekObj);
+                    console.log('Got:\t\t' + weekObj.eid);
                     var jsonObj = JSON.parse(body),
                         gameRef = jsonObj[Object.keys(jsonObj)[0]];
 
-                    //for (var stat in gameRef.home.stats) {
-                    //    if (stat !== 'team') {
-                    //        var statObj = gameRef.home.stats[stat];
-                    //
-                    //        for (var prop in statObj) {
-                    //            if (!(prop in playersObj)) {
-                    //                playersObj[prop] = {
-                    //                    name: statObj[prop].name
-                    //                };
-                    //            }
-                    //        }
-                    //    }
-                    //}
+                    //console.log('Getting Home Team Stats');
+                    for (var stat in gameRef.home.stats) {
+                        if (stat !== 'team') {
+                            var statObj = gameRef.home.stats[stat];
+
+                            for (var prop in statObj) {
+                                if (!(prop in playersObj)) {
+                                    console.log('Found New Player: ' + prop);
+                                    playersObj[prop] = {
+                                        name: statObj[prop].name
+                                    };
+                                }
+                            }
+                        }
+                    }
+
+                    //console.log('Getting Away Team Stats');
+                    for (var stat in gameRef.away.stats) {
+                        if (stat !== 'team') {
+                            var statObj = gameRef.away.stats[stat];
+
+                            for (var prop in statObj) {
+                                if (!(prop in playersObj)) {
+                                    console.log('Found New Player: ' + prop);
+                                    playersObj[prop] = {
+                                        name: statObj[prop].name
+                                    };
+                                }
+                            }
+                        }
+                    }
+
+                    for (var drive in gameRef.drives) {
+                        if (drive !== 'crntdrive') {
+                            for (var play in gameRef.drives[drive].plays) {
+                                //console.log(gameRef.drives[drive].plays[play]);
+                                var playPlayers = Object.keys(gameRef.drives[drive].plays[play].players);
+
+                                if (playPlayers.length !== 0) {
+                                    playPlayers.forEach(function (gsis) {
+                                        if (gsis !== '0') {
+                                            if(!(gsis in playersObj)) {
+                                                //Player not in mapping
+
+                                                console.log(gsis + ' not in mapping');
+                                                playersObj[gsis] = {
+                                                    gsis_name: gameRef.drives[drive].plays[play].players[gsis][0].playerName
+                                                };
+
+                                                console.log(playersObj[gsis]);
+                                            }
+
+
+                                        }
+                                    });
+                                }
+                            }
+                        }
+
+                    }
 
                     gameRef.season = season;
                     gameRef.week = obj.week;
@@ -140,15 +187,15 @@ function getGameData(seasonArray, season, playersObj, getGameCallback) {
             console.log(err);
         }
 
-        getGameCallback();
+        console.log('Writing Player Changes to File');
 
-        //fs.writeFile('/home/vagrant/fyp/fyp-app/jsonData/players.json', JSON.stringify(playersObj), { flags: 'wx' }, function (err) {
-        //    if (err) {
-        //        return console.log(err);
-        //    }
-        //
-        //    getGameCallback();
-        //});
+        fs.writeFile('/home/vagrant/fyp/fyp-app/jsonData/players.json', JSON.stringify(playersObj), { flags: 'wx' }, function (err) {
+            if (err) {
+                return console.log(err);
+            }
+
+            getGameCallback();
+        });
     });
 }
 

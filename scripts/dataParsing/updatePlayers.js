@@ -55,7 +55,7 @@ function loadPlayerJSON(callback) {
 }
 
 function getPlayerProfileIDs(players, callback) {
-    async.each(Object.keys(players), function (player, callback) {
+    async.eachLimit(Object.keys(players), 1, function (player, callback) {
         if (!(players[player].hasOwnProperty('player_profile_url'))) {
 
             console.log('Requesting: (' + player + ')');
@@ -124,7 +124,7 @@ function getTeamAbbrs(players, callback) {
 }
 
 function checkTeamRosters(teams, players, callback) {
-    if (process.argv.indexOf('--no-update') !== -1) {
+    if (process.argv.indexOf('--no-roster-update') !== -1) {
         console.log('Skipping Player Roster Update');
         return callback(null, players);
     }
@@ -198,7 +198,7 @@ function checkTeamRosters(teams, players, callback) {
                     console.log('Found Player in Mapping, Updating Details:');
                     //Player was found in mapping, update details
                     players[posInArray] = {
-                        player_team_id: team.team_id,
+                        team_id: team.team_id,
                         player_first_name: playerName[1],
                         player_last_name: playerName[0],
                         player_position: $(rosterPlayer).children()
