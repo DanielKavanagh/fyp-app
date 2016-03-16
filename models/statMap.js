@@ -112,13 +112,6 @@ statMap.set(16, {
     description: 'Passing attempt and completion, resulting in a touchdown'
 });
 
-statMap.set(16, {
-    category: 'passing',
-    fields: ['passing_att', 'passing_cmp', 'passing_td'],
-    yards: 'passing_cmp_tot_yds',
-    description: 'Passing attempt and completion, resulting in a touchdown'
-});
-
 statMap.set(19, {
     category: 'passing',
     fields: ['passing_att', 'passing_incmp', 'passing_int'],

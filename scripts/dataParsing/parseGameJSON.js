@@ -347,7 +347,6 @@ function insertGamePlays(gameId, playArr, connection, callback) {
             function (play, playId, callback) {
                 console.log('Inserting Player Play');
                 var playPlayers = Object.keys(play.players);
-                console.log(play);
 
                 if (playPlayers.length === 0) {
                     callback(null);
@@ -360,9 +359,7 @@ function insertGamePlays(gameId, playArr, connection, callback) {
                                 if (err) {
                                     return console.log(err);
                                 }
-
-                                console.log(result);
-
+                                
                                 if (result.length !== 1) {
                                     return console.log('More than one player found, check data consistency');
                                 }
