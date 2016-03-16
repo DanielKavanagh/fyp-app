@@ -12,8 +12,8 @@ var cheerio = require('cheerio');
 var mkdirp = require('mkdirp');
 var fs = require('fs');
 
-var Player = require('../../models/player.js');
-var pool = require('../../models/mysqldb.js');
+var Player = require('../models/player.js');
+var pool = require('../models/mysqldb.js');
 
 //Global variables
 var baseUrl = 'http://www.nfl.com',

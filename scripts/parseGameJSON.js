@@ -7,48 +7,13 @@
 var async = require('async');
 var mysql = require('mysql');
 var fs = require('fs');
-var pool = require('../../models/mysqldb.js');
-var Game = require('../../models/game.js');
-var Drive = require('../../models/drive.js');
-var Play = require('../../models/play.js');
-var AggPlay = require('../../models/aggPlay.js');
-var PlayerPlay = require('../../models/playerPlay.js');
-var StatMap = require('../../models/statMap.js');
-
-//function readWeekDirectory(directory, callback) {
-//    var gameArray = [];
-//
-//    console.log('Reading Game Directory');
-//
-//    fs.readdir(directory, function (err, files) {
-//        if (err) {
-//            return console.log(err);
-//        }
-//
-//        //Read each file in the directory
-//        async.eachLimit(files, 1, function (file, readCallback) {
-//            console.log('Reading File: ' + file);
-//            fs.readFile(directory + file, 'utf-8', function (err, content) {
-//                if (err) {
-//                    return console.log(err);
-//                }
-//
-//                gameArray.push(JSON.parse(content));
-//
-//                process.nextTick(function () {
-//                    readCallback();
-//                });
-//            });
-//        }, function (err) {
-//            if (err) {
-//                return console.log(err);
-//            } else {
-//                //Pass gameArray to next function using callback
-//                callback(null, gameArray);
-//            }
-//        });
-//    });
-//}
+var pool = require('../models/mysqldb.js');
+var Game = require('../models/game.js');
+var Drive = require('../models/drive.js');
+var Play = require('../models/play.js');
+var AggPlay = require('../models/aggPlay.js');
+var PlayerPlay = require('../models/playerPlay.js');
+var StatMap = require('../models/statMap.js');
 
 function parseGameData(directory, callback) {
 
@@ -359,7 +324,7 @@ function insertGamePlays(gameId, playArr, connection, callback) {
                                 if (err) {
                                     return console.log(err);
                                 }
-                                
+
                                 if (result.length !== 1) {
                                     return console.log('More than one player found, check data consistency');
                                 }
@@ -423,7 +388,7 @@ function insertGamePlays(gameId, playArr, connection, callback) {
 
 function main() {
     if (process.argv.length !== 3) {
-        return console.log('Usage: node buildRelationalModel.js ' +
+        return console.log('Usage: node parseGameJSON.js ' +
             'path/to/directory');
     }
 
