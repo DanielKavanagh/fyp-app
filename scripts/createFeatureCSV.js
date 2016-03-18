@@ -15,8 +15,10 @@ async.waterfall([
     calculateHFA
 ], function (err, result) {
     if (err) {
-
+        return console.log(err);
     }
+
+    console.log(result);
 });
 
 function getTeams(callback) {
@@ -36,7 +38,9 @@ function calculateHFA(teams, connection, callback) {
     var featureArray = [];
 
     async.each(teams, function (team, callback) {
-        
+        var teamFeatureObj = {};
+
+        connection.query('')
     }, function (err) {
         if (err) {
             return callback(err);

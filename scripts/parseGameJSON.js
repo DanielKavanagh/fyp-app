@@ -117,7 +117,12 @@ function insertGame(game, connection, callback) {
                 away_turnovers: gameRef.away.stats.team.trnovr,
                 away_total_punts: gameRef.away.stats.team.pt,
                 away_total_punt_yards: gameRef.away.stats.team.ptyds,
-                away_total_punt_avg: gameRef.away.stats.team.ptavg
+                away_total_punt_avg: gameRef.away.stats.team.ptavg,
+
+                game_week: gameRef.week,
+                game_year: gameRef.season,
+                game_type: gameRef.gameType,
+                game_start_time: gameRef.time
             });
 
             //callback(null, game, 1, connection);

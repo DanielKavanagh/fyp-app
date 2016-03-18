@@ -27,40 +27,39 @@ function getEIDs(season, getEIDCallback) {
             var eidArray = [];
             weekIndex++;
 
-            request('http://www.nfl.com/ajax/scorestrip?season=' + season + '&seasonType=REG&week=' + weekIndex, function (err, response, body) {
-                if (err) {
-                    console.log('HTTP Error: ' + err);
-                    return;
-                }
-
-                /*Add game EIDs to eidArray*/
-                parseString(body, function (err, result) {
+            request('http://www.nfl.com/ajax/scorestrip?season=' + season + '&seasonType=REG&week=' + weekIndex,
+                function (err, response, body) {
                     if (err) {
-                        return console.log(err);
+                        console.log('HTTP Error: ' + err);
+                        return;
                     }
 
-                    async.each(result.ss.gms[0].g, function (id, callback) {
-                        eidArray.push({
-                            eid: id.$.eid,
-                            time: id.$.t,
-                            type: id.$.gt
+                    /*Add game EIDs to eidArray*/
+                    parseString(body, function (err, result) {
+                        if (err) {
+                            return console.log(err);
+                        }
+
+                        async.each(result.ss.gms[0].g, function (id, callback) {
+                            eidArray.push({
+                                eid: id.$.eid,
+                                time: id.$.t,
+                                type: id.$.gt
+                            });
+
+                            callback();
                         });
-
-                        callback();
                     });
+
+                    var weekObj = {
+                        week: weekIndex,
+                        games: eidArray
+                    };
+
+                    seasonArray.push(weekObj);
+                    response.resume();
+                    weekCallback(null, weekIndex);
                 });
-
-                var weekObj = {
-                    week: weekIndex,
-                    games: eidArray
-                };
-
-                seasonArray.push(weekObj);
-
-                response.resume();
-
-                weekCallback(null, weekIndex);
-            });
         },
 
         function (err) {
@@ -155,7 +154,6 @@ function getGameData(seasonArray, season, playersObj, getGameCallback) {
                                 }
                             }
                         }
-
                     }
 
                     gameRef.season = season;
