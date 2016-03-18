@@ -7,31 +7,25 @@
 var mysql = require('mysql');
 
 var Team = function (data) {
-    this.team_abbr = data.abbr;
-    this.team_name = data.name;
-    this.team_city = data.city;
-    this.team_division = data.division;
-    this.team_conference = data.conference;
+    this.team = data;
 };
 
-var method = Team.prototype;
-
-method.getAttribute = function (attribute) {
+Team.prototype.getAttribute = function (attribute) {
     return this[attribute];
 };
 
-method.setAttribute = function (attribute, value) {
+Team.prototype.setAttribute = function (attribute, value) {
     this[attribute] = value;
 };
 
-method.save = function (callback) {
+Team.prototype.insert = function (callback) {
 
 };
 
-method.delete = function (callback) {
+Team.prototype.delete = function (callback) {
 
 };
 
-method.findByID = function (id, callback) {
+Team.prototype.findByID = function (id, callback) {
 
 };
