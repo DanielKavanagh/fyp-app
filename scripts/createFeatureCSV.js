@@ -1,6 +1,8 @@
 /**
  * Created by Daniel on 17/03/2016.
  *
+ * This script extracts feature attributes from the MySQL database.
+ * Extraction occurs 
  */
 
 'use strict';
