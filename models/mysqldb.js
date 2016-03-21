@@ -8,7 +8,8 @@ var pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
     password: 'root123',
-    database: 'FYP_DB'
+    database: 'FYP_DB',
+    multipleStatements: true
 });
 
 module.exports = pool;
