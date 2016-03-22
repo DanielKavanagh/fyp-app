@@ -174,16 +174,26 @@ function insertGameDrives(game, gameId, connection, callback) {
                     drive_end_position: drive.end.yrdln
                 });
 
-                driveId++;
+                driveId += 1;
 
                 var playArr = Object.keys(drive.plays).map(function (k) {
                     return drive.plays[k];
                 });
 
+                var offensivePlays = 0;
+
                 playArr.forEach(function (play) {
+                    var noteString = JSON.stringify(play.note);
+
+                    if (noteString === 'null' || noteString === '"TD"') {
+                        offensivePlays += 1;
+                    }
+
                     play.driveID = driveObj.getAttribute('drive_id');
                     play.posteamID = driveObj.getAttribute('team_id');
                 });
+
+                driveObj.setAttribute('drive_off_plays', offensivePlays);
 
                 driveObj.insert(connection, function (err, result) {
                     if (err) {
