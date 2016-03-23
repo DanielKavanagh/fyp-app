@@ -19,13 +19,11 @@ html(lang='en')
                 h1.text-center.header-title NFL-DB
                 p.text-center.header-subtitle Using data mining and predictive analytics to predict the future of the NFL
                 button.btn.btn-header(type='button') Learn More
-        section.row.container-fluid.index-predictions
-            h2.text-center.section-header Recent Predictions
-            div.col-md-12
-                include ./fragments/predictionPanel.jade
-                include ./fragments/predictionPanel.jade
-                include ./fragments/predictionPanel.jade
-        footer.row.container-fluid
-            div.col-md-12
-                br
-                p Created by Daniel Kavanagh
+        section.container-fluid.index-predictions
+            div.row
+                h2.text-center.section-header Recent Predictions
+                div.col-md-12
+                    include ./fragments/predictionPanel.jade
+                    include ./fragments/predictionPanel.jade
+                    include ./fragments/predictionPanel.jade
+        include ./fragments/footer.jade

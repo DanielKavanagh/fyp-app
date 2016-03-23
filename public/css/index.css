@@ -1,5 +1,6 @@
 html, body {
     height: 100%;
+    width: 100%;
     background-color: #FFF;
 }
 
@@ -54,6 +55,11 @@ body {
     color: #004953;
 }
 
+.btn-header:focus {
+    background-color: #FFF;
+    color: #004953;
+}
+
 .index-predictions {
     padding-top: 20px;
     padding-bottom: 20px;
@@ -66,7 +72,7 @@ body {
 footer {
     height: 10%;
     color: #FFFFFF;
-    background-color: #004953;
+    background-color: #2a2730;
     font-weight: 200;
 }
 
