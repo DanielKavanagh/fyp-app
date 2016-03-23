@@ -33,7 +33,7 @@ function findByURL(array, url) {
 }
 
 function savePlayers(players, callback) {
-    fs.writeFile('/home/vagrant/fyp/fyp-app/jsonData/players.json',
+    fs.writeFile('/home/vagrant/fyp/fyp-app/data/players/players.json',
         JSON.stringify(players), {flags: 'wx'}, function (err) {
             if (err) {
                 return callback(err);
@@ -44,7 +44,7 @@ function savePlayers(players, callback) {
 }
 
 function loadPlayerJSON(callback) {
-    fs.readFile('/home/vagrant/fyp/fyp-app/jsonData/players.json', 'utf-8',
+    fs.readFile('/home/vagrant/fyp/fyp-app/data/players/players.json', 'utf-8',
         function (err, content) {
             if (err) {
                 return console.log(err);

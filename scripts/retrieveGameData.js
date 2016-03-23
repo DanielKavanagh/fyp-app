@@ -75,7 +75,7 @@ function getEIDs(season, getEIDCallback) {
 }
 
 function readPlayerJson(seasonArray, season, callback) {
-    fs.readFile('/home/vagrant/fyp/fyp-app/jsonData/players.json', 'utf-8', function (err, content) {
+    fs.readFile('/home/vagrant/fyp/fyp-app/data/players/players.json', 'utf-8', function (err, content) {
         if (err) {
             return console.log(err);
         }
@@ -161,7 +161,7 @@ function getGameData(seasonArray, season, playersObj, getGameCallback) {
                     gameRef.time = weekObj.time;
                     gameRef.gameType = weekObj.type;
 
-                    fs.writeFile('/home/vagrant/fyp/fyp-app/jsonData/gameJSON/' + weekObj.eid, JSON.stringify(jsonObj), { flags: 'wx' }, function (err) {
+                    fs.writeFile('/home/vagrant/fyp/fyp-app/data/games/' + weekObj.eid, JSON.stringify(jsonObj), { flags: 'wx' }, function (err) {
                         if (err) {
                             return console.log(err);
                         }
@@ -187,7 +187,7 @@ function getGameData(seasonArray, season, playersObj, getGameCallback) {
 
         console.log('Writing Player Changes to File');
 
-        fs.writeFile('/home/vagrant/fyp/fyp-app/jsonData/players.json', JSON.stringify(playersObj), { flags: 'wx' }, function (err) {
+        fs.writeFile('/home/vagrant/fyp/fyp-app/data/players/players.json', JSON.stringify(playersObj), { flags: 'wx' }, function (err) {
             if (err) {
                 return console.log(err);
             }

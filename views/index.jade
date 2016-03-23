@@ -19,11 +19,9 @@ html(lang='en')
                 h1.text-center.header-title NFL-DB
                 p.text-center.header-subtitle Using data mining and predictive analytics to predict the future of the NFL
                 button.btn.btn-header(type='button') Learn More
-        section.container-fluid.index-predictions
+        section.container-fluid
             div.row
-                h2.text-center.section-header Recent Predictions
-                div.col-md-12
-                    include ./fragments/predictionPanel.jade
-                    include ./fragments/predictionPanel.jade
-                    include ./fragments/predictionPanel.jade
-        include ./fragments/footer.jade
+                h2.text-center Latest Predictions
+                //p.header-subtitle.text-center #{predictions.season}, week #{predictions.week}
+                hr
+            include fragments/predictionsTable.jade

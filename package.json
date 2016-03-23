@@ -19,12 +19,14 @@
   "dependencies": {
     "async": "^1.5.2",
     "cheerio": "^0.20.0",
+    "csvtojson": "^0.5.2",
     "express": "~4.13.3",
     "jade": "~1.11.0",
     "json2csv": "^3.2.0",
     "lodash": "^4.5.1",
     "mkdirp": "~0.5.1",
     "mysql": "~2.9.0",
+    "node-weka": "0.0.8",
     "request": "~2.67.0",
     "sequelize": "^3.19.3",
     "xml2js": "~0.4.16"

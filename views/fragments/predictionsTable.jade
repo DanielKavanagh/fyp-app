@@ -1,0 +1,15 @@
+div.row
+    for prediction, i in predictionList
+        + predictionPanel(prediction
+
+mixin predictionPanel(homeTeam, awayTeam, winner)
+    .panel.panel-default
+        .panel-body
+            p.home= homeTeam
+            br
+            p.away= awayTeam
+            br
+            p.winner= winner
+
+
+
