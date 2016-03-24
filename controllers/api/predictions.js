@@ -4,39 +4,81 @@
 
 'use strict';
 
-var db = require('../../middleware/dbPool');
 var express = require('express');
 var router = express.Router();
 
-var Prediction = require('../../models/prediction.js');
+var prediction = require('../../models/prediction');
 
-router.route('/api/predictions/')
+router.route('/api/predictions/:season-:week')
     .get(function (req, res) {
-        res.send('hi!');
+        var season = Math.floor(req.params.season),
+            week = Math.floor(req.params.week);
+
+        if (Number.isInteger(season) === false || Number.isInteger(week) === false) {
+            return res.status(400).send({
+                error: 'Season & Week must be valid integers'
+            });
+        }
+
+        prediction.getByWeekSeason(season, week, function (err, result) {
+            if (err) {
+                return res.status(500).send({
+                    error: err
+                });
+            }
+
+            res.json(result);
+        });
     });
 
-router.route('/api/predictions/:id')
+router.route('/api/predictions/:season')
     .get(function (req, res) {
+        var season = Math.floor(req.params.season);
+
+        if (Number.isInteger(season) === false) {
+            return res.status(400).send({
+                error: 'Season must be a valid integer'
+            });
+        }
+
+        prediction.getSeason(season, function (err, result) {
+            if (err) {
+                return res.status(500).send({
+                    error: err
+                });
+            }
+
+            res.json(result);
+        });
 
     });
 
 //Returns the latest n predictions
 router.route('/api/predictions/latest/:num')
     .get(function (req, res) {
-        if (req.params.num > 16) {
-            res.status(500).send({
-                error: '/latest can only return up to 16 predictions'
+        var numParam =  Math.floor(req.params.num);
+
+        if (Number.isInteger(numParam) === false) {
+            return res.status(400).send({
+                error: 'Parameter must be a valid integer'
             });
         }
 
-        Prediction.getLatest(10, function (err, predictions) {
+        if (numParam > 16 || numParam <= 0) {
+            return res.status(400).send({
+                error: 'Parameter must be between 1-16'
+            });
+        }
+        
+        prediction.getLatest(numParam, function (err, result) {
             if (err) {
-                res.send(err);
+                return res.status(500).send({
+                    error: err
+                });
             }
-            res.send(predictions);
+
+            res.json(result);
         });
     });
-
-
 
 module.exports = router;
