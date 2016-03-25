@@ -1,0 +1,50 @@
+mixin predictionPanel(home, away, winner)
+    div.panel.panel-default
+        div.panel-body
+            p= home
+
+doctype html
+html(lang='en')
+    head
+        title NFL-DB
+        meta(charset='UTF-8')
+        link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'
+            crossorigin="anonymous")
+
+        script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js')
+        script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js')
+        script(src='js/predictions.js')
+        link(rel='stylesheet', href='/css/index.css')
+    body
+        include ./fragments/navbar.jade
+        div.container-fluid.page-container
+            div.row
+                div.col-xs-12
+                    .btn-group(role='group', aria-label='...')
+                        .btn-group(role='group')
+                            button.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
+                                | Seasons
+                                span.caret
+                            ul.dropdown-menu
+                                for season in seasons
+                                    li
+                                        a(href='#')= season.game_year
+                        for season in seasons
+                            if season.game_year == currSeason
+                                for week in season.weeks
+                                    if week == currWeek
+                                        button.btn.btn-default.active(type='button')= week
+                                    else
+                                        button.btn.btn-default(type='button')= week
+            div.row
+                div.col-xs-12
+                    div.page-header
+                        h1
+                            | Example page header
+            div.row
+                div.col-xs-12
+
+
+
+
+

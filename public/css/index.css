@@ -69,6 +69,10 @@ body {
     padding-bottom: 20px;
 }
 
+.page-container {
+    margin-top: 40px;
+}
+
 footer {
     height: 10%;
     color: #FFFFFF;
@@ -79,4 +83,20 @@ footer {
 section {
     padding-top: 20px;
     padding-bottom: 20px;
+}
+
+.prediction-container {
+    width: 100%;
+    padding: 10px;
+    margin: 10px auto 10px auto;
+    border: 1px solid #DDD;
+    border-radius: 3px;
+}
+
+.team-img-thumbnail {
+    height: 80px;
+}
+
+span.caret {
+    margin-left: 2px !important;
 }

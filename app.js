@@ -6,7 +6,12 @@ var router = express.Router();
 
 var port = process.env.PORT || 3000;
 
+app.use(require('./controllers/index'));
+app.use(require('./controllers/prediction'));
+
 app.use(require('./controllers/api/predictions'));
+app.use(require('./controllers/api/teams'));
+
 
 // router.route('/')
 //     .get(function (req, res) {
@@ -39,8 +44,36 @@ app.use(require('./controllers/api/predictions'));
 //
 //     });
 
+// development error handler
+// will print stacktrace
+
+
+// production error handler
+// no stacktraces leaked to user
+
 
 app.use('/', router);
+
+if (app.get('env') === 'development') {
+
+    app.use(function (err, req, res, next) {
+        res.status(err.status || 500);
+        res.render('error', {
+            message: err.message,
+            error: err
+        });
+    });
+
+}
+
+app.use(function (err, req, res, next) {
+    res.status(err.status || 500);
+    res.render('error', {
+        message: err.message,
+        error: {}
+    });
+});
+
 app.use(express.static(__dirname + '/public'));
 app.set('view engine', 'jade');
 app.listen(port);

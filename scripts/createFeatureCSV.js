@@ -59,8 +59,8 @@ function retrieveTeams(games, connection, callback) {
 }
 
 function extractFeatureData_1(games, teams, connection, callback) {
-    var columnNames = ['geid', 'gseason', 'gweek', 'htabbr', 'hthwr',
-            'htowr', 'hthtor', 'hthtop', 'atabbr', 'atawr', 'atowr',
+    var columnNames = ['geid', 'gseason', 'gweek', 'htid', 'hthwr',
+            'htowr', 'hthtor', 'hthtop', 'atid', 'atawr', 'atowr',
             'atator', 'atatop', 'gw'],
         gameFeatureArray = [];
 
@@ -83,9 +83,9 @@ function extractFeatureData_1(games, teams, connection, callback) {
                     callback(null, game.game_week);
                 });
             },
-            htabbr: function (callback) {
+            htid: function (callback) {
                 process.nextTick(function () {
-                    callback(null, teams[game.home_team_id - 1].team_abbr);
+                    callback(null, game.home_team_id);
                 });
             },
             hthwr: function (callback) {
@@ -140,9 +140,9 @@ function extractFeatureData_1(games, teams, connection, callback) {
                     callback(null, result[1][0]['@returnValue']);
                 });
             },
-            atabbr: function (callback) {
+            atid: function (callback) {
                 process.nextTick(function () {
-                    callback(null, teams[game.away_team_id - 1].team_abbr);
+                    callback(null, game.away_team_id);
                 });
 
             },
@@ -714,6 +714,226 @@ function extractFeatureData_1(games, teams, connection, callback) {
 //
 //                 callback(null, 'Feature File Saved');
 //             });
+//         });
+//     });
+// }
+
+// function extractFeatureData_5(games, teams, connection, callback) {
+//     var columnNames = ['geid', 'gseason', 'gweek', 'htabbr', 'hthwr',
+//             'htowr', 'htcwr', 'hthtor', 'hthtop', 'atabbr', 'atawr', 'atowr',
+//             'atcwr', 'atator', 'atatop', 'gw'],
+//         gameFeatureArray = [];
+//
+//     async.each(games, function (game, callback) {
+//         console.log('Extracting game: ' + game.game_id);
+//
+//         async.parallel({
+//             geid: function (callback) {
+//                 process.nextTick(function () {
+//                     callback(null, game.game_eid);
+//                 });
+//             },
+//             gseason: function (callback) {
+//                 process.nextTick(function () {
+//                     callback(null, game.game_year);
+//                 });
+//             },
+//             gweek: function (callback) {
+//                 process.nextTick(function () {
+//                     callback(null, game.game_week);
+//                 });
+//             },
+//             htabbr: function (callback) {
+//                 process.nextTick(function () {
+//                     callback(null, teams[game.home_team_id - 1].team_abbr);
+//                 });
+//             },
+//             hthwr: function (callback) {
+//                 var sql = 'CALL aggregateHomeTeamWinRate(' + game.home_team_id +
+//                     ', ' + game.game_id + ', 8, @returnValue );' +
+//                     'SELECT @returnValue';
+//
+//                 connection.query(sql, function (err, result) {
+//                     if (err) {
+//                         return callback(err);
+//                     }
+//
+//                     callback(null, result[1][0]['@returnValue']);
+//                 });
+//             },
+//             htowr: function (callback) {
+//                 var sql = 'CALL aggregateOverallTeamWinRate(' +
+//                     game.home_team_id + ', ' + game.game_id +
+//                     ', 16, @returnValue );' + 'SELECT @returnValue';
+//
+//                 connection.query(sql, function (err, result) {
+//                     if (err) {
+//                         return callback(err);
+//                     }
+//
+//                     callback(null, result[1][0]['@returnValue']);
+//                 });
+//             },
+//             htcwr: function (callback) {
+//                 var sql = 'CALL teamOverallWinrate(' +
+//                     game.home_team_id + ', ' + game.game_id +
+//                     ', @returnValue );' + 'SELECT @returnValue';
+//
+//                 connection.query(sql, function (err, result) {
+//                     if (err) {
+//                         return callback(err);
+//                     }
+//
+//                     callback(null, result[1][0]['@returnValue']);
+//                 });
+//             },
+//             hthtor: function (callback) {
+//                 var sql = 'CALL aggregateHomeTurnoverRate(' +
+//                     game.home_team_id + ', ' + game.game_id +
+//                     ', 8, @returnValue ); SELECT @returnValue';
+//
+//                 connection.query(sql, function (err, result) {
+//                     if (err) {
+//                         return callback(err);
+//                     }
+//
+//                     callback(null, result[1][0]['@returnValue']);
+//                 });
+//             },
+//             hthtop: function (callback) {
+//                 var sql = 'CALL homeTimeOfPossession(' +
+//                     game.home_team_id + ', ' + game.game_id +
+//                     ', 8, @returnValue ); SELECT @returnValue';
+//
+//                 connection.query(sql, function (err, result) {
+//                     if (err) {
+//                         return callback(err);
+//                     }
+//
+//                     callback(null, result[1][0]['@returnValue']);
+//                 });
+//             },
+//             atabbr: function (callback) {
+//                 process.nextTick(function () {
+//                     callback(null, teams[game.away_team_id - 1].team_abbr);
+//                 });
+//
+//             },
+//             atawr: function (callback) {
+//                 var sql = 'CALL aggregateAwayTeamWinRate(' + game.away_team_id +
+//                     ', ' + game.game_id + ', 8, @returnValue );' +
+//                     'SELECT @returnValue';
+//
+//                 connection.query(sql, function (err, result) {
+//                     if (err) {
+//                         return callback(err);
+//                     }
+//
+//                     callback(null, result[1][0]['@returnValue']);
+//                 });
+//             },
+//             atowr: function (callback) {
+//                 var sql = 'CALL aggregateOverallTeamWinRate(' +
+//                     game.away_team_id + ', ' + game.game_id +
+//                     ', 16, @returnValue );' + 'SELECT @returnValue';
+//
+//                 connection.query(sql, function (err, result) {
+//                     if (err) {
+//                         return callback(err);
+//                     }
+//
+//                     callback(null, result[1][0]['@returnValue']);
+//                 });
+//             },
+//             atcwr: function (callback) {
+//                 var sql = 'CALL teamOverallWinrate(' +
+//                     game.away_team_id + ', ' + game.game_id +
+//                     ', @returnValue );' + 'SELECT @returnValue';
+//
+//                 connection.query(sql, function (err, result) {
+//                     if (err) {
+//                         return callback(err);
+//                     }
+//
+//                     callback(null, result[1][0]['@returnValue']);
+//                 });
+//             },
+//             atator: function (callback) {
+//                 var sql = 'CALL aggregateAwayTurnoverRate(' +
+//                     game.away_team_id + ', ' + game.game_id +
+//                     ', 8, @returnValue ); SELECT @returnValue';
+//
+//                 connection.query(sql, function (err, result) {
+//                     if (err) {
+//                         return callback(err);
+//                     }
+//
+//                     callback(null, result[1][0]['@returnValue']);
+//                 });
+//             },
+//             atatop: function (callback) {
+//                 var sql = 'CALL awayTimeOfPossession(' +
+//                     game.away_team_id + ', ' + game.game_id +
+//                     ', 8, @returnValue ); SELECT @returnValue';
+//
+//                 connection.query(sql, function (err, result) {
+//                     if (err) {
+//                         return callback(err);
+//                     }
+//
+//                     callback(null, result[1][0]['@returnValue']);
+//                 });
+//             },
+//             gw: function (callback) {
+//                 if (game.home_score_final > game.away_score_final) {
+//                     callback(null, 'h');
+//                 } else if (game.home_score_final < game.away_score_final) {
+//                     callback(null, 'a');
+//                 } else {
+//                     callback(null, 'd');
+//                 }
+//             }
+//         }, function (err, results) {
+//             if (err) {
+//                 return callback(err);
+//             }
+//
+//             console.log('Extracted Features for Game: ' + game.game_id);
+//
+//             if (results.gw !== 'd') {
+//                 gameFeatureArray.push(results);
+//             }
+//
+//             callback();
+//
+//         });
+//     }, function (err) {
+//         //Loop has completed
+//         if (err) {
+//             return callback(err);
+//         }
+//
+//         //Export feature set as CSV
+//         console.log('Extracted features, exporting to csv');
+//
+//         json2csv({
+//             data: gameFeatureArray,
+//             fields: columnNames
+//         }, function (err, csv) {
+//             if (err) {
+//                 return callback(err);
+//             }
+//
+//             fs.writeFile('/home/vagrant/fyp/fyp-app/data/features/' +
+//                 'featureTesting_5.csv', csv, function (err) {
+//                     if (err) {
+//                         return callback(err);
+//                     }
+//
+//                     connection.release();
+//
+//                     callback(null, 'Feature File Saved');
+//                 });
 //         });
 //     });
 // }

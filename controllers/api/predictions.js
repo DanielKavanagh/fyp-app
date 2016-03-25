@@ -9,6 +9,19 @@ var router = express.Router();
 
 var prediction = require('../../models/prediction');
 
+router.route('/api/predictions/seasons/')
+    .get(function (req, res) {
+        prediction.getAvailableSeasons(function (err, result) {
+            if (err) {
+                return res.status(500).send({
+                    error: err
+                });
+            }
+
+            res.json(result);
+        });
+    });
+
 router.route('/api/predictions/:season-:week')
     .get(function (req, res) {
         var season = Math.floor(req.params.season),
@@ -20,7 +33,8 @@ router.route('/api/predictions/:season-:week')
             });
         }
 
-        prediction.getByWeekSeason(season, week, function (err, result) {
+        prediction.getByWeekAndSeason(season, week, function (err, result) {
+            console.log(err);
             if (err) {
                 return res.status(500).send({
                     error: err
@@ -41,7 +55,7 @@ router.route('/api/predictions/:season')
             });
         }
 
-        prediction.getSeason(season, function (err, result) {
+        prediction.getBySeason(season, function (err, result) {
             if (err) {
                 return res.status(500).send({
                     error: err
@@ -52,6 +66,29 @@ router.route('/api/predictions/:season')
         });
 
     });
+
+router.route('/api/predictions/:season/weeks')
+    .get(function (req, res) {
+        var season = Math.floor(req.params.season);
+
+        if (Number.isInteger(season) === false) {
+            return res.status(400).send({
+                error: 'Season must be a valid integer'
+            });
+        }
+
+        prediction.getAvailableSeasonWeeks(season, function (err, result) {
+            if (err) {
+                return res.status(500).send({
+                    error: err
+                });
+            }
+
+            res.json(result);
+        });
+
+    });
+
 
 //Returns the latest n predictions
 router.route('/api/predictions/latest/:num')
@@ -69,7 +106,7 @@ router.route('/api/predictions/latest/:num')
                 error: 'Parameter must be between 1-16'
             });
         }
-        
+
         prediction.getLatest(numParam, function (err, result) {
             if (err) {
                 return res.status(500).send({
@@ -80,5 +117,7 @@ router.route('/api/predictions/latest/:num')
             res.json(result);
         });
     });
+
+
 
 module.exports = router;
