@@ -1,26 +1,5 @@
-//
-   Created by Daniel on 22/03/2016.
+extends layout
 
-doctype html
-html(lang='en')
-    head
-        title NFL-DB
-        meta(charset='UTF-8')
-
-        link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'
-            crossorigin="anonymous")
-        link(rel='stylesheet', href='/css/index.css')
-        script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js')
-        script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js')
-        script(src='js/index.js')
-    body
-        include ./fragments/navbar.jade
-        main.home-header
-            div.header-text
-                h1.text-center.header-title NFL-DB
-                p.text-center.header-subtitle Using data mining and predictive analytics to predict the future of the NFL
-                button.btn.btn-header(type='button') Learn More
-        section.container-fluid
-            div.row
-                h2.text-center.col-xs-12 Latest Predictions
-                    hr
+block content
+  h1= title
+  p Welcome to #{title}

@@ -1,14 +1,29 @@
-/**
- * Created by Daniel on 23/03/2016.
- */
-
 'use strict';
 
-var fs = require('fs');
-var pool = require('../middleware/dbPool');
+var db = require('../db');
+
+/**
+ * Method that retrieves all predictions from the DB
+ */
+exports.getAll = function (callback) {
+    db.getConnection(function (err, conn) {
+        if (err) {
+            return callback(err);
+        }
+
+        conn.query('SELECT * FROM prediction', function (err, rows) {
+            if (err) {
+                return callback(err);
+            }
+
+            connection.release();
+            callback(null, rows);
+        });
+    });
+}
 
 exports.getByWeekAndSeason = function (season, week, callback) {
-    pool.getConnection(function (err, connection) {
+    db.getConnection(function (err, connection) {
         if (err) {
             return callback(err);
         }
@@ -17,30 +32,27 @@ exports.getByWeekAndSeason = function (season, week, callback) {
             'p.actual_winner_id, p.probability,' +
             'ht.team_id as home_team_id, ht.team_abbr as home_team_abbr,' +
             'ht.team_name as home_team_name,' +
-            'at.team_id as away_team_id, at.team_abbr as away_team_abbr,' +
-            'at.team_name as away_team_abbr ' +
+            'at.team_id as away_team_id, at.team_name as away_team_name,' +
+            'at.team_abbr as away_team_abbr ' +
             'FROM prediction p ' +
             'JOIN game g ON p.game_id = g.game_id ' +
             'JOIN team ht ON g.home_team_id = ht.team_id ' +
             'JOIN team at ON g.away_team_id = at.team_id ' +
             'WHERE (g.game_year = ? AND g.game_week = ?)';
 
-        connection.query(sql, [season, week], function (err, results) {
+        connection.query(sql, [season, week], function (err, rows) {
             if (err) {
                 return callback(err);
             }
 
-            if (results.length === 0) {
-                return callback('No Data Returned');
-            }
-
-            callback(null, results);
+            connection.release();
+            callback(null, rows);
         });
     });
 };
 
 exports.getBySeason = function (season, callback) {
-    pool.getConnection(function (err, connection) {
+    db.getConnection(function (err, connection) {
         if (err) {
             return callback(err);
         }
@@ -57,16 +69,13 @@ exports.getBySeason = function (season, callback) {
             'JOIN team at ON g.away_team_id = at.team_id ' +
             'WHERE g.game_year = ?';
 
-        connection.query(sql, [season], function (err, results) {
+        connection.query(sql, [season], function (err, rows) {
             if (err) {
                 return callback(err);
             }
 
-            if (results.length === 0) {
-                return callback('No Data Returned');
-            }
-
-            callback(null, results);
+            connection.release();
+            callback(null, rows);
         });
     });
 };
@@ -87,10 +96,7 @@ exports.getAvailableSeasons = function (callback) {
                 return callback(err);
             }
 
-            if (results.length === 0) {
-                return callback('No Data Returned');
-            }
-
+            connection.release();
             callback(null, results);
         });
     });
@@ -117,8 +123,8 @@ exports.getAvailableSeasonWeeks = function (season, callback) {
                 return callback('No Data Returned');
             }
 
+            connection.release();
             callback(null, results);
         });
     });
 };
-

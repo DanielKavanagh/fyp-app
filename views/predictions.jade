@@ -1,50 +1,84 @@
-mixin predictionPanel(home, away, winner)
-    div.panel.panel-default
-        div.panel-body
-            p= home
+extends ./layout
 
-doctype html
-html(lang='en')
-    head
-        title NFL-DB
-        meta(charset='UTF-8')
-        link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'
-            crossorigin="anonymous")
+block scripts
+    script(src='/javascripts/predictions.js')
 
-        script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js')
-        script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js')
-        script(src='js/predictions.js')
-        link(rel='stylesheet', href='/css/index.css')
-    body
-        include ./fragments/navbar.jade
-        div.container-fluid.page-container
-            div.row
-                div.col-xs-12
-                    .btn-group(role='group', aria-label='...')
-                        .btn-group(role='group')
-                            button.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
-                                | Seasons
-                                span.caret
-                            ul.dropdown-menu
-                                for season in seasons
-                                    li
-                                        a(href='#')= season.game_year
-                        for season in seasons
-                            if season.game_year == currSeason
-                                for week in season.weeks
-                                    if week == currWeek
-                                        button.btn.btn-default.active(type='button')= week
-                                    else
-                                        button.btn.btn-default(type='button')= week
-            div.row
-                div.col-xs-12
-                    div.page-header
-                        h1
-                            | Example page header
-            div.row
-                div.col-xs-12
+block content
+    span#prediction-data.hidden(data-season = '#{initialSeason}' data-week = '#{initialWeek}')
+    div.container-fluid
+        div.row
+            div.col-xs-12.text-center
+                .btn-group(role='group', aria-label='prediction-selector')
+                    .btn-group(role='group')
+                        button.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown',
+                        aria-haspopup='true', aria-expanded='false')
+                            | Seasons
+                            span.caret
+                        ul.dropdown-menu
+                            li
+                                a(href='#') 2015
+                    - for (var i = 1; i < 18; i++) {
+                        if initialWeek == i
+                            button.btn.btn-default.week-button.active(type='button' id=i)= i
+                        else
+                            button.btn.btn-default.week-button(type='button' id=i)= i
+                    - }
+        div.row
+            div.col-xs-12.col-md-8.col-md-offset-2
+                div.page-header.text-center
+                    h1 Predictions
+                        small.prediction-subheader 2015, Week 17
+        div.row
+            div.col-xs-12.col-md-10.col-md-offset-1.prediction-list
+                div.panel.panel-default.prediction-container
+                    div.panel-body
+                        div.away-team-container
+                            div.away-team-img-container
+                                img(src='/images/CAR-min.png').away-team-img
+                            div.away-team-info-container
+                                h1.away-team-name Carolina Panthers
+                                    small.away-team-abbr CAR
 
-
-
-
-
+                        div.prediction-info-container
+                            p.at-symbol @
+                        div.home-team-container
+                            div.home-team-img-container
+                                img(src='/images/DEN-min.png').home-team-img
+                            div.home-team-info-container
+                                h1.home-team-name Denver Broncos
+                                    small.home-team-abbr DEN
+                                span.label.label-success Predicted Winner
+                                br
+                                span.label.label-primary Actual Winner
+    script#prediction(type='text/x-handlebars-template').
+        <div class="panel panel-default prediction-container">
+            <div class="panel-body">
+                <div class="away-team-container">
+                    <div class="away-team-img-container"><img src="/images/{{away_team_abbr}}-min.png" class="away-team-img"/></div>
+                    <div class="away-team-info-container">
+                        <h1 class="away-team-name">{{away_team_name}}<small class="away-team-abbr">{{away_team_abbr}}</small></h1>
+                        {{#equal predicted_winner_id away_team_id}}
+                        <span class="label label-success">Predicted Winner</span>
+                        {{/equal}}
+                        {{#equal actual_winner_id away_team_id}}
+                        <span class="label label-primary">Actual Winner</span>
+                        {{/equal}}
+                    </div>
+                </div>
+                <div class="prediction-info-container">
+                    <p class="at-symbol">@</p>
+                </div>
+                <div class="home-team-container">
+                    <div class="home-team-img-container"><img src="/images/{{home_team_abbr}}-min.png" class="home-team-img"/></div>
+                    <div class="home-team-info-container">
+                        <h1 class="home-team-name">{{home_team_name}}<small class="home-team-abbr">{{home_team_abbr}}</small></h1>
+                        {{#equal predicted_winner_id home_team_id}}
+                        <span class="label label-success">Predicted Winner</span>
+                        {{/equal}}
+                        {{#equal actual_winner_id home_team_id}}
+                        <span class="label label-primary">Actual Winner</span>
+                        {{/equal}}
+                    </div>
+                </div>
+            </div>
+        </div>

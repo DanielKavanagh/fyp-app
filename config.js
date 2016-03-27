@@ -1,7 +1,6 @@
 /**
- * Created by Daniel on 23/03/2016.
+ * Created by Daniel on 26/03/2016.
  */
-
 module.exports = {
     db_dev: {
         host: 'localhost',
