@@ -1,5 +1,9 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  main.home-header
+    div.header-text
+      h1.text-center.header-title NFL-DB
+      p.text-center.header-subtitle Using data mining and predictive analytics to predict the future of the NFL
+      a(href='/about/')
+        button.btn.btn-header(type='button') Learn More

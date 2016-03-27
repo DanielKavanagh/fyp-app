@@ -66,6 +66,10 @@ block content
             </div>
             <div class="prediction-info-container">
                 <p class="at-symbol">@</p>
+                <div class="probability-container">
+                    <b>Confidence:</b>
+                    {{probability}}
+                </div>
             </div>
             <div class="home-team-container">
                 <div class="home-team-img-container"><img src="/images/{{home_team_abbr}}-min.png" class="home-team-img"/></div>
@@ -80,4 +84,5 @@ block content
                     {{/equal}}
                 </div>
             </div>
+
         </div>

@@ -8,5 +8,13 @@ module.exports = {
         password: 'root123',
         database: 'FYP_DB',
         multipleStatements: true
+    },
+
+    db_prob: {
+        host: '',
+        user: '',
+        password: '',
+        database: 'FYP_DB',
+        multipleStatements: true
     }
 };

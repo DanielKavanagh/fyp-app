@@ -7,17 +7,6 @@ $(document).ready(function () {
     var predictionTemplate = $('#prediction').html();
     template = Handlebars.compile(predictionTemplate);
 
-    // $('.prediction-list').append (template ({
-    //     predicted_winner_id: 2,
-    //     actual_winner_id: 3,
-    //     home_team_id: 3,
-    //     home_team_abbr: 'BAL',
-    //     home_team_name: 'Denver Broncos',
-    //     away_team_id: 2,
-    //     away_team_abbr: 'PHI',
-    //     away_team_name: 'Philadelphia Eagles'
-    // }));
-
     getInitialPredictions();
     initialiseEvents();
 
@@ -55,6 +44,7 @@ function getPredictionData(season, week) {
         })
         .done(function (data) {
             updatePredictionTable(data);
+            updateChart(data);
         })
         .fail(function (jqxhr, textStatus) {
             console.log(textStatus);
@@ -64,8 +54,13 @@ function getPredictionData(season, week) {
 function updatePredictionTable(predictions) {
     $('.prediction-list').empty();
     $.each(predictions, function (index, prediction) {
+        prediction.probability = (prediction.probability).toFixed(2);
         $('.prediction-list').append (template (prediction));
     });
+}
+
+function updateChart(data) {
+
 }
 
 function updateWeekButton(clickedButton) {
@@ -77,7 +72,6 @@ function updateWeekButton(clickedButton) {
 function updatePredictionHeader(season, week) {
     $('.prediction-subheader').text(season + ', Week ' + week);
 }
-
 
 function registerHelpers() {
     Handlebars.registerHelper('equal', function (lvalue, rvalue, options) {

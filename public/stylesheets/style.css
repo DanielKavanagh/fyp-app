@@ -1,5 +1,13 @@
+html {
+    height: 100%;
+    width: 100%;
+}
+
 body {
     padding-top: 70px;
+    height: 100%;
+    width: 100%;
+    background-color: #FFF;
 }
 
 span.caret {
@@ -14,31 +22,66 @@ h1 small {
     margin-left: 5px;
 }
 
+.home-header {
+    height: 70%;
+    background-color: #004953;
+    margin-top: -40px;
+    color: #FFF;
+}
+
+.header-text {
+    text-align: center;
+    position: relative;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+
+.header-title {
+    font-size: 5em;
+    font-weight: 400;
+}
+
+.header-subtitle {
+    font-weight: 300;
+    font-size: 1.3em;
+    margin-bottom: 20px;
+}
+
+.btn-header {
+    height: 60px;
+    width: 150px;
+    border-color: #FFF;
+    background-color: #004953;
+    color: #FFF;
+    font-size: 1.2em;
+    margin: auto;
+    transition: 0.05s linear;
+}
+
+.btn-header:hover {
+    background-color: #FFF;
+    color: #004953;
+}
+
+.btn-header:focus {
+    background-color: #FFF;
+    color: #004953;
+}
+
+
 .prediction-container {
     display: flex;
     height: 120px;
     flex-direction: row;
     align-items: stretch;
     justify-content: space-between;
-    overflow: auto;
     padding: 10px 5px 10px 5px;
     border: 1px solid #DDD;
     border-radius: 3px;
     overflow: hidden;
     margin-bottom: 20px;
-    border-color: #a94442;
-}
-
-.correct-prediction {
-    border-color: #3c763d;
-}
-
-.correct-prediction .away-team-img-container {
-    border-color: #3c763d;
-}
-
-.correct-prediction .home-team-img-container {
-    border-color: #3c763d;
 }
 
 .away-team-container {
@@ -53,7 +96,7 @@ h1 small {
     max-width: 25%;
     margin-right: 10px;
     padding-right: 5px;
-    border-right: 1px solid #a94442;
+    border-right: 1px solid #DDD;
 }
 
 .away-team-img {
@@ -74,10 +117,13 @@ h1 small {
 
 .prediction-info-container {
     display: flex;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
 }
 
 .at-symbol {
+    align-self: center;
     font-size: 1.6em;
     margin: 0;
 }
@@ -94,7 +140,7 @@ h1 small {
     display: flex;
     max-width: 25%;
     margin-left: 10px;
-    border-left: 1px solid #a94442;
+    border-left: 1px solid #DDD;
     padding-left: 5px;
 }
 
@@ -122,53 +168,7 @@ h1 small {
     background-color: #3c763d;
 }
 
-/*.away-team-container {*/
-    /*float: left;*/
-    /*width: 45%;*/
-/*}*/
-
-/*.prediction-info-container {*/
-    /*position: absolute;*/
-    /*width: 10%;*/
-    /*top: 50%;*/
-    /*left: 50%;*/
-    /*transform: translate(-50%, -50%);*/
-    /*text-align: center;*/
-/*}*/
-
-/*.home-team-container {*/
-    /*float: right;*/
-    /*width: 45%;*/
-    /*text-align: right;*/
-/*}*/
-
-/*.home-team-img-container {*/
-    /*float: right;*/
-    /*padding-left: 5px;*/
-    /*margin-left: 5px;*/
-    /*border-left: 1px solid #DDD;*/
-    /*width: 30%;*/
-/*}*/
-
-/*.away-team-img-container {*/
-    /*float: left;*/
-    /*padding-right: 5px;*/
-    /*margin-right: 5px;*/
-    /*border-right: 1px solid #DDD;*/
-    /*width: 30%;*/
-/*}*/
-
-/*.away-team-img {*/
-    /*width: 100%;*/
-/*}*/
-
-/*.home-team-img {*/
-    /*width: 100%;*/
-/*}*/
-
-
-
-/*.at-symbol {*/
-    /*margin: 0;*/
-    /*font-size: 2em;*/
-/*}*/
+.probability-container {
+    align-self: flex-end;
+    text-align: center;
+}
