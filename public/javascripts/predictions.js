@@ -7,16 +7,16 @@ $(document).ready(function () {
     var predictionTemplate = $('#prediction').html();
     template = Handlebars.compile(predictionTemplate);
 
-    $('.prediction-list').append (template ({
-        predicted_winner_id: 2,
-        actual_winner_id: 3,
-        home_team_id: 3,
-        home_team_abbr: 'BAL',
-        home_team_name: 'Denver Broncos',
-        away_team_id: 2,
-        away_team_abbr: 'PHI',
-        away_team_name: 'Philadelphia Eagles'
-    }));
+    // $('.prediction-list').append (template ({
+    //     predicted_winner_id: 2,
+    //     actual_winner_id: 3,
+    //     home_team_id: 3,
+    //     home_team_abbr: 'BAL',
+    //     home_team_name: 'Denver Broncos',
+    //     away_team_id: 2,
+    //     away_team_abbr: 'PHI',
+    //     away_team_name: 'Philadelphia Eagles'
+    // }));
 
     getInitialPredictions();
     initialiseEvents();

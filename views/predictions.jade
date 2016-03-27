@@ -30,55 +30,54 @@ block content
                         small.prediction-subheader 2015, Week 17
         div.row
             div.col-xs-12.col-md-10.col-md-offset-1.prediction-list
-                div.panel.panel-default.prediction-container
-                    div.panel-body
-                        div.away-team-container
-                            div.away-team-img-container
-                                img(src='/images/CAR-min.png').away-team-img
-                            div.away-team-info-container
-                                h1.away-team-name Carolina Panthers
-                                    small.away-team-abbr CAR
-
-                        div.prediction-info-container
-                            p.at-symbol @
-                        div.home-team-container
-                            div.home-team-img-container
-                                img(src='/images/DEN-min.png').home-team-img
-                            div.home-team-info-container
-                                h1.home-team-name Denver Broncos
-                                    small.home-team-abbr DEN
-                                span.label.label-success Predicted Winner
-                                br
-                                span.label.label-primary Actual Winner
+                div.prediction-container
+                    div.away-team-container
+                        div.away-team-img-container
+                            img(src='/images/SEA-min.png').away-team-img
+                        div.away-team-info-container
+                            h1.away-team-name Atlanta Falcons
+                                small.away-team-abbr ATL
+                    div.prediction-info-container
+                        p.at-symbol @
+                    div.home-team-container
+                        div.home-team-img-container
+                            img(src='/images/ATL-min.png').home-team-img
+                        div.home-team-info-container
+                            h1.home-team-name Seattle Seahawks
+                                small.home-team-abbr SEA
     script#prediction(type='text/x-handlebars-template').
-        <div class="panel panel-default prediction-container">
-            <div class="panel-body">
-                <div class="away-team-container">
-                    <div class="away-team-img-container"><img src="/images/{{away_team_abbr}}-min.png" class="away-team-img"/></div>
-                    <div class="away-team-info-container">
-                        <h1 class="away-team-name">{{away_team_name}}<small class="away-team-abbr">{{away_team_abbr}}</small></h1>
-                        {{#equal predicted_winner_id away_team_id}}
-                        <span class="label label-success">Predicted Winner</span>
-                        {{/equal}}
-                        {{#equal actual_winner_id away_team_id}}
-                        <span class="label label-primary">Actual Winner</span>
-                        {{/equal}}
-                    </div>
+        {{#equal predicted_winner_id actual_winner_id}}
+            <div class="prediction-container correct-prediction">
+        {{else}}
+            <div class="prediction-container">
+        {{/equal}}
+            <div class="away-team-container">
+                <div class="away-team-img-container"><img src="/images/{{away_team_abbr}}-min.png" class="away-team-img"/></div>
+                <div class="away-team-info-container">
+                    <h1 class="away-team-name">{{away_team_name}}<small class="away-team-abbr">{{away_team_abbr}}</small></h1>
+                    {{#equal predicted_winner_id away_team_id}}
+                        <span class="label label-success prediction-label">Predicted Winner</span>
+                    {{/equal}}
+                    <div class="label-clear"></div>
+                    {{#equal actual_winner_id away_team_id}}
+                        <span class="label label-primary prediction-label">Actual Winner</span>
+                    {{/equal}}
                 </div>
-                <div class="prediction-info-container">
-                    <p class="at-symbol">@</p>
-                </div>
-                <div class="home-team-container">
-                    <div class="home-team-img-container"><img src="/images/{{home_team_abbr}}-min.png" class="home-team-img"/></div>
-                    <div class="home-team-info-container">
-                        <h1 class="home-team-name">{{home_team_name}}<small class="home-team-abbr">{{home_team_abbr}}</small></h1>
-                        {{#equal predicted_winner_id home_team_id}}
-                        <span class="label label-success">Predicted Winner</span>
-                        {{/equal}}
-                        {{#equal actual_winner_id home_team_id}}
-                        <span class="label label-primary">Actual Winner</span>
-                        {{/equal}}
-                    </div>
+            </div>
+            <div class="prediction-info-container">
+                <p class="at-symbol">@</p>
+            </div>
+            <div class="home-team-container">
+                <div class="home-team-img-container"><img src="/images/{{home_team_abbr}}-min.png" class="home-team-img"/></div>
+                <div class="home-team-info-container">
+                    <h1 class="home-team-name">{{home_team_name}}<small class="home-team-abbr">{{home_team_abbr}}</small></h1>
+                    {{#equal predicted_winner_id home_team_id}}
+                        <span class="label label-success prediction-label">Predicted Winner</span>
+                    {{/equal}}
+                    <div class="label-clear"></div>
+                    {{#equal actual_winner_id home_team_id}}
+                        <span class="label label-primary prediction-label">Actual Winner</span>
+                    {{/equal}}
                 </div>
             </div>
         </div>
