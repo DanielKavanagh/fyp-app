@@ -10,7 +10,7 @@ module.exports = {
         multipleStatements: true
     },
 
-    db_prob: {
+    db_prod: {
         host: '',
         user: '',
         password: '',

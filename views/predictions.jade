@@ -30,21 +30,6 @@ block content
                         small.prediction-subheader 2015, Week 17
         div.row
             div.col-xs-12.col-md-10.col-md-offset-1.prediction-list
-                div.prediction-container
-                    div.away-team-container
-                        div.away-team-img-container
-                            img(src='/images/SEA-min.png').away-team-img
-                        div.away-team-info-container
-                            h1.away-team-name Atlanta Falcons
-                                small.away-team-abbr ATL
-                    div.prediction-info-container
-                        p.at-symbol @
-                    div.home-team-container
-                        div.home-team-img-container
-                            img(src='/images/ATL-min.png').home-team-img
-                        div.home-team-info-container
-                            h1.home-team-name Seattle Seahawks
-                                small.home-team-abbr SEA
     script#prediction(type='text/x-handlebars-template').
         {{#equal predicted_winner_id actual_winner_id}}
             <div class="prediction-container correct-prediction">

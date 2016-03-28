@@ -1,9 +1,67 @@
 extends layout
 
+block scripts
+    script(src='/javascripts/index.js')
+
 block content
-  main.home-header
-    div.header-text
-      h1.text-center.header-title NFL-DB
-      p.text-center.header-subtitle Using data mining and predictive analytics to predict the future of the NFL
-      a(href='/about/')
-        button.btn.btn-header(type='button') Learn More
+    span#prediction-data.hidden(data-season = '#{initialSeason}' data-week = '#{initialWeek}')
+    main.home-header
+        div.header-text
+            h1.text-center.header-title NFL Analytics
+            p.text-center.header-subtitle Using data mining and predictive analytics to predict the future of the NFL
+            a(href='/about/')
+                button.btn.btn-header(type='button') Learn More
+    div.container-fluid
+        div.row
+            div.col-xs-12.col-md-8.col-md-offset-2
+                div.page-header.text-center
+                    h1 Recent Predictions
+                        small.prediction-subheader #{initialSeason}, Week #{initialWeek}
+        div.row
+            div.col-xs-12.col-md-10.col-md-offset-1.prediction-list
+        div.row
+            br
+            div.col-xs-12.col-md-10.col-md-offset-1.text-center
+                a(href='/predictions/')
+                    button.btn.btn-index(type='button') View More
+        script#prediction(type='text/x-handlebars-template').
+            {{#equal predicted_winner_id actual_winner_id}}
+                <div class="prediction-container correct-prediction">
+            {{else}}
+                <div class="prediction-container">
+            {{/equal}}
+                <div class="away-team-container">
+                    <div class="away-team-img-container"><img src="/images/{{away_team_abbr}}-min.png" class="away-team-img"/></div>
+                    <div class="away-team-info-container">
+                        <h1 class="away-team-name">{{away_team_name}}<small class="away-team-abbr">{{away_team_abbr}}</small></h1>
+                        {{#equal predicted_winner_id away_team_id}}
+                            <span class="label label-success prediction-label">Predicted Winner</span>
+                        {{/equal}}
+                        <div class="label-clear"></div>
+                        {{#equal actual_winner_id away_team_id}}
+                            <span class="label label-primary prediction-label">Actual Winner</span>
+                        {{/equal}}
+                    </div>
+                </div>
+                <div class="prediction-info-container">
+                    <p class="at-symbol">@</p>
+                    <div class="probability-container">
+                        <b>Confidence:</b>
+                        {{probability}}
+                    </div>
+                </div>
+                <div class="home-team-container">
+                    <div class="home-team-img-container"><img src="/images/{{home_team_abbr}}-min.png" class="home-team-img"/></div>
+                    <div class="home-team-info-container">
+                        <h1 class="home-team-name">{{home_team_name}}<small class="home-team-abbr">{{home_team_abbr}}</small></h1>
+                        {{#equal predicted_winner_id home_team_id}}
+                            <span class="label label-success prediction-label">Predicted Winner</span>
+                        {{/equal}}
+                        <div class="label-clear"></div>
+                        {{#equal actual_winner_id home_team_id}}
+                            <span class="label label-primary prediction-label">Actual Winner</span>
+                        {{/equal}}
+                    </div>
+                </div>
+
+            </div>

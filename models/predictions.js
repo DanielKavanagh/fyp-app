@@ -6,12 +6,23 @@ var db = require('../db');
  * Method that retrieves all predictions from the DB
  */
 exports.getAll = function (callback) {
-    db.getConnection(function (err, conn) {
+    db.getConnection(function (err, connection) {
         if (err) {
             return callback(err);
         }
 
-        conn.query('SELECT * FROM prediction', function (err, rows) {
+        var sql = 'SELECT p.prediction_id, g.game_id, p.predicted_winner_id,' +
+            'p.actual_winner_id, p.probability,' +
+            'ht.team_id as home_team_id, ht.team_abbr as home_team_abbr,' +
+            'ht.team_name as home_team_name,' +
+            'at.team_id as away_team_id, at.team_name as away_team_name,' +
+            'at.team_abbr as away_team_abbr ' +
+            'FROM prediction p ' +
+            'JOIN game g ON p.game_id = g.game_id ' +
+            'JOIN team ht ON g.home_team_id = ht.team_id ' +
+            'JOIN team at ON g.away_team_id = at.team_id ';
+
+        connection.query(sql, function (err, rows) {
             if (err) {
                 return callback(err);
             }

@@ -172,3 +172,38 @@ h1 small {
     align-self: flex-end;
     text-align: center;
 }
+
+.btn-index {
+    height: 60px;
+    width: 150px;
+    border-color: #004953;
+    background-color: #FFF;
+    color: #004953;
+    font-size: 1.2em;
+    margin: auto;
+    transition: 0.05s linear;
+}
+
+.btn-index:hover {
+    background-color: #004953;
+    color: #FFF;
+}
+
+footer {
+    padding-top: 20px;
+    padding-bottom: 10px;
+    margin-top: 50px;
+    text-align: center;
+}
+
+.created-by {
+    color: #111;
+}
+
+.links {
+    text-align: right;
+}
+
+.footer-icon {
+    height: 20px;
+}
