@@ -6,12 +6,12 @@
 
 var fs = require('fs');
 var async = require('async');
-var pool = require('../middleware/dbPool');
+var pool = require('../db');
 var mysql = require('mysql');
 
 function main() {
     if (process.argv.length !== 3) {
-        return console.log('Error');
+        return console.log('Error: Must provide path to json prediction file');
     }
 
     async.waterfall([

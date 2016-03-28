@@ -14,10 +14,21 @@ router.get('/predictions/', function(req, res, next) {
     });
 });
 
+router.get('/predictions/seasons/', function (req, res, next) {
+    model.getAvailableSeasons(function (err, rows) {
+        if (err) {
+            return next(err);
+        }
+
+        res.json(rows);
+    });
+});
+
+
 router.get('/predictions/:season-:week', function (req, res, next) {
     var season = req.params.season,
         week = req.params.week;
-    
+
     model.getByWeekAndSeason(season, week, function (err, rows) {
         if (err) {
             return next(err);

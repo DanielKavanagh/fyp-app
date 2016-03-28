@@ -14,9 +14,8 @@ block content
                         aria-haspopup='true', aria-expanded='false')
                             | Seasons
                             span.caret
-                        ul.dropdown-menu
-                            li
-                                a(href='#') 2015
+                        ul.dropdown-menu.season-dropdown
+
                     - for (var i = 1; i < 18; i++) {
                         if initialWeek == i
                             button.btn.btn-default.week-button.active(type='button' id=i)= i

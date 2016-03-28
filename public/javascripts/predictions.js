@@ -7,10 +7,28 @@ $(document).ready(function () {
     var predictionTemplate = $('#prediction').html();
     template = Handlebars.compile(predictionTemplate);
 
+    getAvailableSeasons();
     getInitialPredictions();
     initialiseEvents();
 
 });
+
+function getAvailableSeasons() {
+    $.ajax({
+        url: '/api/predictions/seasons',
+        method: 'GET',
+        dataType: 'json',
+        timeout: 5000
+    })
+    .done(function (data) {
+        $.each(data, function (index, season) {
+            $('.season-dropdown').append('<li><a href="#'+ season.season +'">' + season.season + '</a></li>');
+        });
+    })
+    .fail(function (jqxhr, textStatus) {
+
+    });
+}
 
 function getInitialPredictions() {
     var week = $('#prediction-data').data('week');

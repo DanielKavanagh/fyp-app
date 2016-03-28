@@ -9,7 +9,7 @@
 
 var async = require('async');
 var mysql = require('mysql');
-var pool = require('../models/mysqldb.js');
+var pool = require('../db');
 var fs = require('fs');
 var json2csv = require('json2csv');
 
@@ -35,7 +35,7 @@ function retrieveGames(callback) {
         console.log('Retrieving games from database...');
 
         connection.query('SELECT * FROM game ' +
-            'WHERE game_year > 2009 and game_year < 2015', function (err, games) {
+            'WHERE game_year = 2014', function (err, games) {
                 if (err) {
                     return callback(err);
                 }
@@ -239,7 +239,7 @@ function extractFeatureData_1(games, teams, connection, callback) {
             }
 
             fs.writeFile('/home/vagrant/fyp/fyp-app/data/features/' +
-                'featureTraining_1.csv', csv, function (err) {
+                'feature_testing_1_2014.csv', csv, function (err) {
                     if (err) {
                         return callback(err);
                     }

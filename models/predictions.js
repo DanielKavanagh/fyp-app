@@ -92,14 +92,15 @@ exports.getBySeason = function (season, callback) {
 };
 
 exports.getAvailableSeasons = function (callback) {
-    pool.getConnection(function (err, connection) {
+    db.getConnection(function (err, connection) {
         if (err) {
             return callback(err);
         }
 
-        var sql = 'SELECT g.game_year FROM prediction p ' +
+        var sql = 'SELECT g.game_year as season FROM prediction p ' +
             'JOIN game g ON p.game_id = g.game_id ' +
-            'GROUP BY g.game_year';
+            'GROUP BY g.game_year ' +
+            'ORDER BY g.game_year desc';
 
 
         connection.query(sql, function (err, results) {
@@ -114,7 +115,7 @@ exports.getAvailableSeasons = function (callback) {
 };
 
 exports.getAvailableSeasonWeeks = function (season, callback) {
-    pool.getConnection(function (err, connection) {
+    db.getConnection(function (err, connection) {
         if (err) {
             return callback(err);
         }
