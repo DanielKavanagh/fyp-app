@@ -27,7 +27,10 @@ function getAvailableSeasons() {
         });
     })
     .fail(function (jqxhr, textStatus) {
-
+        showError({
+            status: jqxhr.status,
+            message: jqxhr.statusText
+        });
     });
 }
 
@@ -68,14 +71,17 @@ function getPredictionData(season, week) {
 
     console.log('Getting Data');
     $.ajax({
-            url: '/api/predictions/' + season + '-' + week,
+            url: '/api/predictions/'+ season +'-' + week,
             method: 'GET',
             dataType: 'json',
             timeout: 5000
         })
         .done(function (data) {
             if (data.length === 0) {
-                showError('No data was found');
+                showError({
+                    status: '',
+                    message: 'Returned an Empty Data Set, Try Selecting Another Week'
+                });
             } else {
                 updatePredictionHeader(season, week);
                 updatePredictionTable(data);
@@ -83,16 +89,28 @@ function getPredictionData(season, week) {
             }
         })
         .fail(function (jqxhr, textStatus) {
-            console.log(textStatus);
+            showError({
+                status: jqxhr.status,
+                message: jqxhr.statusText
+            });
         });
 }
 
 function showError(error) {
     $('.prediction-list').empty();
-    $('.prediction-list').append('<div class="text-center">' +
-            '<p>' + error + '</p>' +
-            '<p>Please try selecting another week</p>' +
-        '</div>')
+
+    if(error.status === 500) {
+        $('.prediction-list').append('<div class="text-center">' +
+            '<p>' + error.status + '</p>' +
+            '<p>' + error.message + '</p>' +
+            '<p><a href="https://github.com/DanielKavanagh/fyp-app/issues">Report this issue</a></p>' +
+            '</div>');
+    } else {
+        $('.prediction-list').append('<div class="text-center">' +
+            '<p>' + error.status + '</p>' +
+            '<p>' + error.message + '</p>' +
+            '</div>');
+    }
 }
 
 function updatePredictionHeader(season, week) {
