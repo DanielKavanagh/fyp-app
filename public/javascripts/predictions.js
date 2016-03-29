@@ -22,7 +22,8 @@ function getAvailableSeasons() {
     })
     .done(function (data) {
         $.each(data, function (index, season) {
-            $('.season-dropdown').append('<li><a href="#'+ season.season +'">' + season.season + '</a></li>');
+            $('.season-dropdown').append('<li id="'+ season.season +'"><a href="#">' + season.season + '</a></li>');
+            $('#' + season.season).on('click', seasonButtonClicked);
         });
     })
     .fail(function (jqxhr, textStatus) {
@@ -41,18 +42,30 @@ function initialiseEvents() {
     $('.week-button').on('click', weekButtonClicked);
 }
 
+function seasonButtonClicked() {
+    getPredictionData($(this).text(), $('#prediction-data').data('week'));
+}
+
 function weekButtonClicked() {
     if (!$(this).hasClass('active')) {
         var season = $('#prediction-data').data('season');
         var week = $(this).text();
         
         updateWeekButton($(this));
-        updatePredictionHeader(season, week);
         getPredictionData(season, week);
     }
 }
 
 function getPredictionData(season, week) {
+    $('.prediction-list').empty();
+    $('.prediction-list').append('<div class="text-center loading-div">' +
+            '<span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>' +
+            '<p>Loading...</p>' +
+        '</div>');
+
+    $('#prediction-data').data('week', week);
+    $('#prediction-data').data('season', season);
+
     console.log('Getting Data');
     $.ajax({
             url: '/api/predictions/' + season + '-' + week,
@@ -61,12 +74,29 @@ function getPredictionData(season, week) {
             timeout: 5000
         })
         .done(function (data) {
-            updatePredictionTable(data);
-            updateChart(data);
+            if (data.length === 0) {
+                showError('No data was found');
+            } else {
+                updatePredictionHeader(season, week);
+                updatePredictionTable(data);
+                updateChart(data);
+            }
         })
         .fail(function (jqxhr, textStatus) {
             console.log(textStatus);
         });
+}
+
+function showError(error) {
+    $('.prediction-list').empty();
+    $('.prediction-list').append('<div class="text-center">' +
+            '<p>' + error + '</p>' +
+            '<p>Please try selecting another week</p>' +
+        '</div>')
+}
+
+function updatePredictionHeader(season, week) {
+    $('.prediction-subheader').text(season + ', Week ' + week);
 }
 
 function updatePredictionTable(predictions) {
@@ -84,11 +114,6 @@ function updateChart(data) {
 function updateWeekButton(clickedButton) {
     $('.week-button.active').removeClass('active');
     clickedButton.addClass('active');
-    $('#prediction-data').data('week', $(clickedButton).text());
-}
-
-function updatePredictionHeader(season, week) {
-    $('.prediction-subheader').text(season + ', Week ' + week);
 }
 
 function registerHelpers() {

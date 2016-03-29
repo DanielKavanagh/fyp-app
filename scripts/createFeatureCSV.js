@@ -35,7 +35,7 @@ function retrieveGames(callback) {
         console.log('Retrieving games from database...');
 
         connection.query('SELECT * FROM game ' +
-            'WHERE game_year = 2014', function (err, games) {
+            'WHERE game_year = 2013', function (err, games) {
                 if (err) {
                     return callback(err);
                 }
@@ -239,7 +239,7 @@ function extractFeatureData_1(games, teams, connection, callback) {
             }
 
             fs.writeFile('/home/vagrant/fyp/fyp-app/data/features/' +
-                'feature_testing_1_2014.csv', csv, function (err) {
+                'feature_testing_1_2013.csv', csv, function (err) {
                     if (err) {
                         return callback(err);
                     }

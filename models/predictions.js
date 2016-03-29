@@ -26,7 +26,7 @@ exports.getAll = function (callback) {
             if (err) {
                 return callback(err);
             }
-
+            
             connection.release();
             callback(null, rows);
         });
