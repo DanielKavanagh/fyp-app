@@ -39,3 +39,5 @@ node_modules
 
 # AWS Elastic Beanstalk
 .elasticbeanstalk/
+
+data/
