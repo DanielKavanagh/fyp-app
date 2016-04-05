@@ -1,5 +1,9 @@
 /**
  * Created by Daniel on 29/02/2016.
+ *
+ * This script reads the /data/games directory and parses the contents of each.
+ * These parsed contents are then inserted into their corresponding database
+ * tables.
  */
 
 'use strict'

@@ -1,7 +1,6 @@
 var template;
 
 $(document).ready(function () {
-
     registerHelpers();
 
     var predictionTemplate = $('#prediction').html();
@@ -13,6 +12,10 @@ $(document).ready(function () {
 
 });
 
+/**
+ * Retrieves an array of the available seaons and appends them to the season
+ * dropdown
+ * */
 function getAvailableSeasons() {
     $.ajax({
         url: '/api/predictions/seasons',
@@ -34,6 +37,9 @@ function getAvailableSeasons() {
     });
 }
 
+/**
+ * Called on page load. Retrieves the weeks predictions
+ * */
 function getInitialPredictions() {
     var week = $('#prediction-data').data('week');
     var season = $('#prediction-data').data('season');
@@ -41,14 +47,23 @@ function getInitialPredictions() {
     getPredictionData(season, week);
 }
 
+/**
+ * Initialises the button events
+ * */
 function initialiseEvents() {
     $('.week-button').on('click', weekButtonClicked);
 }
 
+/**
+ * Function that triggers when a season is selected from the season dropdown.
+ * */
 function seasonButtonClicked() {
     getPredictionData($(this).text(), $('#prediction-data').data('week'));
 }
 
+/**
+ * Function that triggers when a week button is clicked
+ * */
 function weekButtonClicked() {
     if (!$(this).hasClass('active')) {
         var season = $('#prediction-data').data('season');
@@ -59,6 +74,12 @@ function weekButtonClicked() {
     }
 }
 
+/**
+ * Retrieves the prediction data for a specific season and week
+ *
+ * @param {integer} season - The requested season
+ * @param {integer} week - The requested week
+ * */
 function getPredictionData(season, week) {
     $('.prediction-list').empty();
     $('.prediction-list').append('<div class="text-center loading-div">' +
@@ -96,6 +117,10 @@ function getPredictionData(season, week) {
         });
 }
 
+/**
+ * Function that shows an error on the screen
+ * @param {object} error - The error object to display
+ * */
 function showError(error) {
     $('.prediction-list').empty();
 
@@ -113,10 +138,21 @@ function showError(error) {
     }
 }
 
+/**
+ * Function that updates the header which shows the current season and week
+ *
+ * @param {integer} season - The current season
+ * @param {integer} week - The current week
+ * */
 function updatePredictionHeader(season, week) {
     $('.prediction-subheader').text(season + ', Week ' + week);
 }
 
+/**
+ * Updates the prediction list with a set of predictions
+ *
+ * @param {array} predictions - An array of prediction objects
+ * */
 function updatePredictionTable(predictions) {
     $('.prediction-list').empty();
     $.each(predictions, function (index, prediction) {
@@ -125,16 +161,21 @@ function updatePredictionTable(predictions) {
     });
 }
 
-function updateChart(data) {
-
-}
-
+/**
+ * Updates the current active week button
+ *
+ * @param {object} clickedButton - The button that was clicked by the user
+ * */
 function updateWeekButton(clickedButton) {
     $('.week-button.active').removeClass('active');
     clickedButton.addClass('active');
 }
 
+/**
+ * Registers the additional helper functions for Handlebars
+ * */
 function registerHelpers() {
+    /*Creates a helper which checks if two given values are equal*/
     Handlebars.registerHelper('equal', function (lvalue, rvalue, options) {
         if (arguments.length < 3) {
             throw new Error("Handlebars Helper equal needs 2 parameters");

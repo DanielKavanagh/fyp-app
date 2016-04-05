@@ -1,5 +1,8 @@
 /**
  * Created by Daniel on 25/03/2016.
+ * 
+ * This command line script inserts a given prediction JSON file into the
+ * prediction table of the database.
  */
 
 'use strict';
@@ -70,9 +73,7 @@ function insertPredictions(predictionJSON, callback) {
                     } else {
                         actualWinnerID = prediction.atid;
                     }
-
-                    console.log(actualWinnerID);
-
+                    
                     connection.query('INSERT INTO prediction SET ?', {
                         game_id: gameID,
                         predicted_winner_id: predictedWinnerID,

@@ -1,5 +1,7 @@
 /**
- * Created by Daniel on 23/03/2016.
+ * This command line script converts a CSV file to JSON format.
+ * Takes two arguments, the location of the CSV file, and
+ * the desired destination of the JSON file
  */
 
 'use strict';
@@ -10,7 +12,7 @@ var converter = new Converter({});
 
 function convertCSVToJSON() {
     if (process.argv.length !== 4) {
-        return console.log('Must supply path to csv file and json file destination');
+        return console.log('node convertCSVToJSON <csv location > <json file destination>');
     }
 
     converter.fromFile(process.argv[2],
