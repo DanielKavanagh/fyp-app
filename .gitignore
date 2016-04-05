@@ -40,4 +40,3 @@ node_modules
 # AWS Elastic Beanstalk
 .elasticbeanstalk/
 
-config.js
