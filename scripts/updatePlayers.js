@@ -1,5 +1,11 @@
 /**
  * Created by Daniel on 03/03/2016.
+ *
+ * This command line script updates the mapping of the players.json file.
+ * First each player whose object is not complete is requested. Second,
+ * each NFL teams roster is queried, and any new players are added to the
+ * mapping. These players are then inserted into the player table of the
+ * database.
  */
 
 'use strict';

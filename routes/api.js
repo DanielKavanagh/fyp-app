@@ -3,7 +3,8 @@ var router = express.Router();
 
 var model = require('../models/predictions');
 
-/* GET all predictions */
+/**
+ * API route to get all predictions */
 router.get('/predictions/', function(req, res, next) {
     model.getAll(function (err, rows) {
         if (err) {
@@ -14,6 +15,9 @@ router.get('/predictions/', function(req, res, next) {
     });
 });
 
+/**
+ * API route that returns all available seasons which have predictions
+ * */
 router.get('/predictions/seasons/', function (req, res, next) {
     model.getAvailableSeasons(function (err, rows) {
         if (err) {

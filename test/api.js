@@ -10,6 +10,7 @@ var api = supertest('http://localhost:3000/api');
 describe('api', function () {
     describe('predictions', function () {
         describe('get-all', function () {
+
             it('should return a 200', function (done) {
                 api.get('/predictions/')
                     .expect(200, done);
@@ -35,6 +36,7 @@ describe('api', function () {
                     .end(function (err, res) {
                         expect(res.body).to.satisfy(isNotEmpty);
                         done();
+
                         function isNotEmpty(array) {
                             if (array.length !== 0) {
                                 return true;
@@ -356,6 +358,20 @@ describe('api', function () {
                             return array.every(function (item) {
                                 return expect(item).to.have.property('season');
                             });
+                        }
+                    });
+            });
+
+            it('should have these property types', function (done) {
+                api.get('/predictions/seasons')
+                    .end(function (err, res) {
+                        expect(res.body).to.satisfy(hasPropertyType);
+                        done();
+
+                        function hasPropertyType(array) {
+                            return array.every(function (item) {
+                                return expect(item.season).to.be.a('number');
+                            })
                         }
                     });
             });

@@ -1,9 +1,15 @@
+/**
+ * Contains the model functions for retrieving predictions from the database
+ * */
+
 'use strict';
 
 var db = require('../db');
 
 /**
- * Method that retrieves all predictions from the DB
+ * Model to retrieve all predictions from the database
+ *
+ * @param {function} callback - The requests callback function
  */
 exports.getAll = function (callback) {
     db.getConnection(function (err, connection) {
@@ -33,6 +39,13 @@ exports.getAll = function (callback) {
     });
 }
 
+/**
+ * Gets a set of predictions for a specific season and week
+ *
+ * @param {integer} season - The requested season
+ * @param {integer} week - The requested week
+ * @param {function} callback - The requests callback function
+ * */
 exports.getByWeekAndSeason = function (season, week, callback) {
     db.getConnection(function (err, connection) {
         if (err) {
@@ -62,6 +75,12 @@ exports.getByWeekAndSeason = function (season, week, callback) {
     });
 };
 
+/**
+ * Gets the set of predictions for a specific season
+ *
+ * @param {integer} season - The requested season
+ * @param {function} callback - The requests callback function
+ * */
 exports.getBySeason = function (season, callback) {
     db.getConnection(function (err, connection) {
         if (err) {
@@ -91,6 +110,11 @@ exports.getBySeason = function (season, callback) {
     });
 };
 
+/**
+ * Gets the seasons for which predictions are available
+ *
+ * @param {function} callback - The requests callback function
+ * */
 exports.getAvailableSeasons = function (callback) {
     db.getConnection(function (err, connection) {
         if (err) {
@@ -114,6 +138,13 @@ exports.getAvailableSeasons = function (callback) {
     });
 };
 
+
+/**
+ * Gets the available prediction weeks for a given season
+ *
+ * @param {integer} season - The requested season
+ * @param {function} callback - The requests callback function
+ * */
 exports.getAvailableSeasonWeeks = function (season, callback) {
     db.getConnection(function (err, connection) {
         if (err) {
@@ -130,11 +161,7 @@ exports.getAvailableSeasonWeeks = function (season, callback) {
             if (err) {
                 return callback(err);
             }
-
-            if (results.length === 0) {
-                return callback('No Data Returned');
-            }
-
+            
             connection.release();
             callback(null, results);
         });

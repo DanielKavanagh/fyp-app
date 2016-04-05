@@ -1,5 +1,5 @@
 /**
- * Created by Daniel on 26/03/2016.
+ * Contains the different configurations for the development and prod databases.
  */
 module.exports = {
     db_dev: {
