@@ -30,7 +30,7 @@ node_modules
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
-
+.ebextensions/
 # WebStorm Project Files
 .idea/
 
