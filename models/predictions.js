@@ -115,6 +115,7 @@ exports.getBySeason = function (season, callback) {
  *
  * @param {function} callback - The requests callback function
  * */
+
 exports.getAvailableSeasons = function (callback) {
     db.getConnection(function (err, connection) {
         if (err) {
